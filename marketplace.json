@@ -10,6 +10,16 @@
         "ref": "v1.23.0"
       },
       "version": "1.23.0"
+    },
+    {
+      "name": "paperless-mcp",
+      "source": {
+        "source": "git-subdir",
+        "url": "https://github.com/pvliesdonk/paperless-mcp.git",
+        "path": ".claude-plugin/plugin",
+        "ref": "v1.0.0"
+      },
+      "version": "1.0.0"
     }
   ]
 }
