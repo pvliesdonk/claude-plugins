@@ -10,6 +10,16 @@
         "ref": "v3.0.0"
       },
       "version": "3.0.0"
+    },
+    {
+      "name": "image-generation-mcp",
+      "source": {
+        "source": "git-subdir",
+        "url": "https://github.com/pvliesdonk/image-generation-mcp.git",
+        "path": ".claude-plugin/plugin",
+        "ref": "v1.10.0"
+      },
+      "version": "1.10.0"
     }
   ]
 }
