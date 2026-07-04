@@ -17,9 +17,9 @@
         "source": "git-subdir",
         "url": "https://github.com/pvliesdonk/image-generation-mcp.git",
         "path": ".claude-plugin/plugin",
-        "ref": "v1.10.0"
+        "ref": "v1.11.0"
       },
-      "version": "1.10.0"
+      "version": "1.11.0"
     }
   ]
 }
