@@ -11,53 +11,8 @@ on:
     types: [opened, synchronize, ready_for_review, reopened]
 
 jobs:
-  wait-for-ci:
-    # Skip PRs from forks and skip automated Renovate PRs
-    if: ${{ github.event.pull_request.head.repo.full_name == github.repository && !startsWith(github.head_ref, 'renovate/') }}
-    runs-on: ubuntu-latest
-    timeout-minutes: 30
-    permissions:
-      actions: read
-    outputs:
-      ci_passed: ${{ steps.wait.outputs.ci_passed }}
-    steps:
-      - name: Wait for CI to conclude on this PR head
-        id: wait
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          REPO: ${{ github.repository }}
-          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
-        run: |
-          set -euo pipefail
-          # Gate the review on the CI workflow: only review code the gate
-          # accepted. Poll the CI run for THIS PR head SHA (not github.sha,
-          # which is the merge commit) until it completes; tolerate the
-          # not-yet-created race by looping. Gate on the run *conclusion*
-          # so CI's continue-on-error 3.14 matrix job never blocks.
-          deadline=$(( SECONDS + 25 * 60 ))
-          conclusion=""
-          while [ "$SECONDS" -lt "$deadline" ]; do
-            runs=$(gh api "repos/${REPO}/actions/workflows/ci.yml/runs?head_sha=${HEAD_SHA}&per_page=1" 2>/dev/null || echo '{}')
-            status=$(echo "$runs" | jq -r '.workflow_runs[0].status // empty')
-            conclusion=$(echo "$runs" | jq -r '.workflow_runs[0].conclusion // empty')
-            if [ "$status" = "completed" ]; then
-              break
-            fi
-            echo "CI status: ${status:-not-found-yet}; waiting 20s..."
-            sleep 20
-          done
-          if [ "$conclusion" = "success" ]; then
-            echo "ci_passed=true" >> "$GITHUB_OUTPUT"
-            echo "CI passed — review will run."
-          else
-            echo "ci_passed=false" >> "$GITHUB_OUTPUT"
-            echo "CI did not pass (conclusion=${conclusion:-timeout}) — skipping review."
-          fi
-
   claude-review:
-    needs: wait-for-ci
-    if: ${{ needs.wait-for-ci.outputs.ci_passed == 'true' }}
-    runs-on: ubuntu-latest
+      runs-on: ubuntu-latest
     permissions:
       contents: read          # Reviewer reads code; it must never commit
       pull-requests: write     # Post inline review comments
@@ -69,37 +24,6 @@ jobs:
         uses: actions/checkout@v7
         with:
           fetch-depth: 1
-
-      - name: Install uv
-        uses: astral-sh/setup-uv@v8.2.0
-        with:
-          version: "latest"
-
-      - name: Cache Python interpreter
-        uses: actions/cache@v6
-        with:
-          path: ~/.local/share/uv/python
-          key: uv-python-3.12-${{ runner.os }}
-
-      - name: Set up Python
-        run: uv python install 3.12
-
-      - name: Install dependencies
-        # Gives the reviewer a working venv so its targeted `uv run` checks
-        # (freedom to investigate one finding) actually execute. REVIEW.md
-        # tells it not to re-run the full gate.
-        #
-        # `--frozen` because this sync must leave the workspace byte-clean:
-        # the review action switches to the PR branch internally, and an
-        # unfrozen sync against a lockfile that is stale relative to
-        # `pyproject.toml` re-locks `uv.lock` in place, so that checkout
-        # aborts ("Your local changes ... would be overwritten") for every PR
-        # whose lockfile differs from the base branch's — no review posted,
-        # deterministically (#326). `--frozen` installs from the lockfile as
-        # committed and never rewrites it; unlike `--locked` it also does not
-        # fail on drift, which is right here — a stale lockfile is CI's
-        # finding to report, not a reason to skip the review.
-        run: uv sync --all-extras --all-groups --frozen
 
       # The /code-review plugin fans out into parallel review agents. On Claude
       # Code >= 2.1.198 those dispatch as background tasks that claude-code-action
@@ -131,7 +55,7 @@ jobs:
           # Surface progress so a silent failure is visible.
           track_progress: true
           display_report: true
-          include_fix_links: false
+          include_fix_links: true
           # Read CI results through the built-in GitHub CI MCP server.
           additional_permissions: |
             actions: read
