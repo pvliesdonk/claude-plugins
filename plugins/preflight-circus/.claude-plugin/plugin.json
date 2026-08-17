@@ -1,0 +1,20 @@
+{
+  "name": "preflight-circus",
+  "version": "1.0.0",
+  "description": "A blind six-lens review gate over BASE..HEAD, run before you push rather than after. Keeps AI-induced technical debt out of the repository by sitting the same examination a post-push review bot would, while the diff is still local and cheap to fix.",
+  "author": {
+    "name": "Peter van Liesdonk",
+    "email": "peter@liesdonk.nl"
+  },
+  "homepage": "https://github.com/pvliesdonk/claude-plugins/tree/main/plugins/preflight-circus",
+  "repository": "https://github.com/pvliesdonk/claude-plugins",
+  "license": "MIT",
+  "keywords": [
+    "code-review",
+    "pull-request",
+    "quality-gate",
+    "pre-push",
+    "technical-debt",
+    "workflow"
+  ]
+}
