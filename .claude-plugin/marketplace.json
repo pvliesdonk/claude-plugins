@@ -1,0 +1,41 @@
+{
+  "name": "pvliesdonk",
+  "owner": {
+    "name": "Peter van Liesdonk",
+    "email": "peter@liesdonk.nl"
+  },
+  "description": "Claude Code plugins by pvliesdonk: MCP servers for markdown vaults, academic literature and image generation, plus development-workflow tooling.",
+  "plugins": [
+    {
+      "name": "markdown-vault-mcp",
+      "source": {
+        "source": "git-subdir",
+        "url": "https://github.com/pvliesdonk/markdown-vault-mcp.git",
+        "path": ".claude-plugin/plugin",
+        "ref": "v3.1.0"
+      },
+      "version": "3.1.0"
+    },
+    {
+      "name": "preflight-circus",
+      "description": "A blind six-lens review gate over BASE..HEAD, run before you push rather than after — the same examination a post-push review bot applies, sat while the diff is still local.",
+      "author": {
+        "name": "Peter van Liesdonk",
+        "email": "peter@liesdonk.nl"
+      },
+      "source": "./plugins/preflight-circus",
+      "category": "development",
+      "homepage": "https://github.com/pvliesdonk/claude-plugins/tree/main/plugins/preflight-circus"
+    },
+    {
+      "name": "scholar-mcp",
+      "source": {
+        "source": "git-subdir",
+        "url": "https://github.com/pvliesdonk/scholar-mcp.git",
+        "path": ".claude-plugin/plugin",
+        "ref": "v1.9.0"
+      },
+      "version": "1.9.0"
+    }
+  ]
+}
