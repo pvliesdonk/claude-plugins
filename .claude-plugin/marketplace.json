@@ -8,6 +8,8 @@
   "plugins": [
     {
       "name": "markdown-vault-mcp",
+      "description": "MCP server for markdown vaults: FTS5 + semantic search, link graph, write/edit/git.",
+      "homepage": "https://pvliesdonk.github.io/markdown-vault-mcp/",
       "source": {
         "source": "git-subdir",
         "url": "https://github.com/pvliesdonk/markdown-vault-mcp.git",
@@ -29,6 +31,8 @@
     },
     {
       "name": "scholar-mcp",
+      "description": "Scholarly-sources MCP server for papers, patents, books, and standards.",
+      "homepage": "https://pvliesdonk.github.io/scholar-mcp/",
       "source": {
         "source": "git-subdir",
         "url": "https://github.com/pvliesdonk/scholar-mcp.git",

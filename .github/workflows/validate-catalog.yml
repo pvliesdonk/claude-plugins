@@ -60,6 +60,21 @@ jobs:
             echo "::endgroup::"
           done
 
+      # The README's plugin list is generated from the manifest. `--check`
+      # catches content drift; the marker assertion catches someone deleting
+      # the region outright, which --check alone would read as "nothing to
+      # generate" rather than as damage.
+      - name: README plugin list is generated and current
+        run: |
+          set -euo pipefail
+          for marker in GENERATED-PLUGIN-LIST-START GENERATED-PLUGIN-LIST-END; do
+            count=$(grep -cF "$marker" README.md || true)
+            [ "$count" = "1" ] || { echo "::error::expected 1 '$marker' marker in README.md, found $count"; exit 1; }
+          done
+          entries=$(sed -n '/GENERATED-PLUGIN-LIST-START/,/GENERATED-PLUGIN-LIST-END/p' README.md | grep -c '^### ' || true)
+          [ "$entries" -gt 0 ] || { echo "::error::README.md's generated plugin list is empty"; exit 1; }
+          python3 scripts/gen_readme.py --check
+
       # Every remote entry resolved at the ref it pins. A manifest can be
       # perfectly well-formed and still list a plugin nobody can install.
       - name: Resolve remote entries

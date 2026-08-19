@@ -196,6 +196,13 @@ def main() -> int:
         else:
             seen.add(str(name))
 
+        # The README's plugin list is generated from these descriptions
+        # (scripts/gen_readme.py), so a missing one is not cosmetic — it
+        # publishes a catalog entry the README cannot describe.  Sibling
+        # releases supply it automatically; a hand-added entry must too.
+        if not str(entry.get("description", "")).strip():
+            _fail(errors, f"{where}: no 'description' (the generated README needs one)")
+
         source = entry.get("source")
         if isinstance(source, str):
             local = f"{plugin_root}/{source}" if plugin_root else source
