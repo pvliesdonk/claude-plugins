@@ -1,0 +1,68 @@
+# Sibling release workflows publish into this catalog by pushing straight to
+# the default branch — the template's publish-claude-plugin job commits
+# without opening a pull request, deliberately, so that a release never ends
+# at a PR waiting for a human. Nothing therefore reviews what lands here.
+#
+# Two defects have already reached `main` unnoticed, and neither announced
+# itself: the manifest sat at the repository root, where Claude Code does not
+# read it, so the catalog was never loadable; and an entry pointed at a
+# `git-subdir` path that existed at none of the tags it listed, so the plugin
+# was uninstallable from the day it was added. Both are shape questions, and
+# this workflow asks them on every push and pull request.
+name: Validate catalog
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: validate-catalog-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      # Offline first: structure, duplicate names, local sources. Fast, and
+      # it fails on the cheapest defects before anything reaches the network.
+      - name: Structural check
+        run: python3 scripts/validate_marketplace.py
+
+      # The consumer's own parser. This is the check that would have caught
+      # the root-level manifest on the day it was written, because it fails
+      # exactly the way `/plugin marketplace add` fails.
+      - name: Install Claude Code
+        run: |
+          set -euo pipefail
+          curl -fsSL https://claude.ai/install.sh | bash
+          echo "$HOME/.local/bin" >> "$GITHUB_PATH"
+          # Throwaway config dir: validation reads the files in the
+          # checkout, and the runner has no account to authenticate as.
+          echo "CLAUDE_CONFIG_DIR=$(mktemp -d)" >> "$GITHUB_ENV"
+
+      - name: Validate the marketplace manifest
+        run: claude plugin validate .
+
+      - name: Validate each in-repo plugin
+        run: |
+          set -euo pipefail
+          shopt -s nullglob
+          for plugin in plugins/*/; do
+            echo "::group::${plugin}"
+            claude plugin validate "./${plugin%/}"
+            echo "::endgroup::"
+          done
+
+      # Every remote entry resolved at the ref it pins. A manifest can be
+      # perfectly well-formed and still list a plugin nobody can install.
+      - name: Resolve remote entries
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: python3 scripts/validate_marketplace.py --check-remote

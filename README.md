@@ -18,12 +18,21 @@ Then install any plugin:
 
 ## Available Plugins
 
+Versions are deliberately not repeated here. Each entry is bumped
+automatically by the publishing project's release workflow, which rewrites
+`.claude-plugin/marketplace.json` and nothing else — a version written into
+this file would go stale on the next release with nothing to notice. Read
+the manifest, or `/plugin`, for what the catalog currently serves.
+
 ### markdown-vault-mcp
 
 A generic markdown collection MCP server with FTS5 + semantic search, frontmatter-aware indexing, and incremental reindexing.
 
 - **Source:** [pvliesdonk/markdown-vault-mcp](https://github.com/pvliesdonk/markdown-vault-mcp)
-- **Version:** 1.20.1
+
+### scholar-mcp
+
+- **Source:** [pvliesdonk/scholar-mcp](https://github.com/pvliesdonk/scholar-mcp)
 
 ### preflight-circus
 
