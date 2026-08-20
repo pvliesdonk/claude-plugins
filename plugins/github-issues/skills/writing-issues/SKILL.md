@@ -11,8 +11,9 @@ context — a reviewer now, or someone reconstructing intent years later — and
 fail the same way: claiming more confidence than you earned, and omitting what you
 left out.
 
-Steps 1–2 and the rules below are for issues; **Pull Request Descriptions** is the
-second half.
+Steps 1–2 cover issues; **Pull Request Descriptions** covers the other half. Everything
+else here — the uncertainty rule, the scope rule, and the clause below about deferring
+to the repo's own conventions — governs both.
 
 ## The Rule: Observation, Not Work Order
 
@@ -102,7 +103,20 @@ shows how the change *was* made and never how it *wasn't*** — the alternative 
 rejected, the scope you deferred, and the part you were least sure of exist nowhere
 else.
 
-### First: it describes the diff that exists
+### First: check for a template
+
+```bash
+ls .github/PULL_REQUEST_TEMPLATE.md .github/PULL_REQUEST_TEMPLATE/ 2>/dev/null
+```
+
+If the repo has one, **fill its sections**. It is the project's stated rule, so it wins
+over the shape below — the same way an issue form wins in Step 1. Do not invent sections
+it omits, and do not replace its headings with these. Where the template asks for
+something this skill does not mention, the template still asks for it.
+
+No template: use the shape below.
+
+### Then: it describes the diff that exists
 
 Write it with `git diff <base>..HEAD` open in front of you, not from what you set out
 to do. Then re-read the description against the file list and delete every claim the
@@ -116,7 +130,7 @@ claim stops trusting every other claim in the description, and they are right to
 
 ### The shape
 
-Five parts, in this order:
+Where no template supplies one, five parts, in this order:
 
 1. **What changes** — one sentence, the outcome for someone using the software. Not a
    tour of the files; the diff already lists those.
@@ -193,6 +207,7 @@ description.
 | A `## Verification` block listing commands you did not run | List only what you ran; name what you skipped |
 | `Closes #TBD`, or "issue to be filed" | File it first, then reference the real number |
 | A file-by-file tour of the diff | One sentence on what changes, then where to look |
+| The skill's five parts used where the repo ships a PR template | Fill the template's sections; it is the project's stated rule |
 | "Refactored for clarity" | Name what was wrong before |
 | The issue title restated as the summary | The issue states the problem; the PR states the resolution |
 | "Should be safe" / "minor change" | Say what you checked, or say you did not check |

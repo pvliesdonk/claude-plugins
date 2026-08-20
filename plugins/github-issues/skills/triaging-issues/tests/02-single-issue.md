@@ -1,6 +1,6 @@
 # 02 — Single incoming issue (F3, F4)
 
-Prepend: "Use the `triaging-issues` skill." Sandbox as in 01.
+Prepend: "Use the `github-issues:triaging-issues` skill." Sandbox as in 01.
 
 > A new issue just came in. Please triage it.
 >

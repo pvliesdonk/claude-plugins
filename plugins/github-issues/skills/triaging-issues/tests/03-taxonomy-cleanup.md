@@ -1,6 +1,6 @@
 # 03 — Taxonomy cleanup (F5, F7)
 
-Prepend: "Use the `triaging-issues` skill." Sandbox as in 01.
+Prepend: "Use the `github-issues:triaging-issues` skill." Sandbox as in 01.
 
 > Our label set has grown organically and is a mess. Please clean it up and set up a
 > proper label scheme.

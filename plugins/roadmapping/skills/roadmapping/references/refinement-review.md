@@ -178,7 +178,7 @@ found, so the next pass knows this was considered rather than skipped.
 ## 10. Handoff boundary
 
 - Is anything here actually a defect or an investigation rather than planned
-  work? That belongs in `writing-issues`, not the roadmap.
+  work? That belongs in `github-issues:writing-issues`, not the roadmap.
 - Is any item ready and therefore due to leave this skill for
   `superpowers:brainstorming`?
 - Has anything been refined that had no reason to be refined yet? Parallel

@@ -1,6 +1,6 @@
 # 05 — PR description vs. the diff that exists
 
-Prepend: "Use the `writing-issues` skill." Sandbox: no network, `gh` unauthenticated,
+Prepend: "Use the `github-issues:writing-issues` skill." Sandbox: no network, `gh` unauthenticated,
 deliverable is the PR description as pasteable markdown.
 
 > You've finished `fix/empty-query-400` and are about to open a PR. There is no PR

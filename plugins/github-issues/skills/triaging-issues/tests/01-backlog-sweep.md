@@ -1,6 +1,6 @@
 # 01 — Backlog sweep (F1, F2, F6)
 
-Prepend: "Use the `triaging-issues` skill." Sandbox: no network, `gh` unauthenticated,
+Prepend: "Use the `github-issues:triaging-issues` skill." Sandbox: no network, `gh` unauthenticated,
 deliverable is the commands the agent WOULD run.
 
 > You are helping maintain `pvliesdonk/markdown-vault-mcp`. Our open issue backlog has
