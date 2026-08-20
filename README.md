@@ -45,6 +45,12 @@ A blind six-lens review gate over BASE..HEAD, run before you push rather than af
 
 - **Source:** [`plugins/preflight-circus`](plugins/preflight-circus) — in this repository
 
+### roadmapping
+
+Chart, refine and revisit multi-epic technical roadmaps at a declared resolution, holding the line against false precision about work nobody has scoped yet.
+
+- **Source:** [`plugins/roadmapping`](plugins/roadmapping) — in this repository
+
 ### scholar-mcp
 
 Scholarly-sources MCP server for papers, patents, books, and standards.

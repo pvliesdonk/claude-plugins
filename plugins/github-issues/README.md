@@ -42,15 +42,17 @@ form when one exists rather than inventing fields.
 ## triaging-issues
 
 The rule is **classify within the scheme, don't redesign it.** Triage answers
-four questions — what kind, whose area, how urgent, which release — and a
+four questions — what kind, whose area, how urgent, and when — and a
 triaged issue carries exactly one type label, zero or more area labels, one
 priority or none deliberately, and zero or more status labels.
 
 Load-bearing distinctions it holds:
 
-- **A milestone is a commitment, not a category.** Labels say what an issue
-  *is*; a milestone says *when it ships*, and many projects gate "safe to cut
-  a release" on milestone emptiness. Absence of a milestone is the backlog.
+- **Establish what a milestone means here before touching one.** Under the
+  release-payload convention it is a shipping commitment, often gating "safe to
+  cut a release", and absence of one is the backlog. Under the epic convention
+  (`roadmapping`) it is a body of intent being refined, and stripping it as
+  speculative destroys the roadmap. The skill names both and refuses to guess.
 - **Close on a reason, never on age.** Staleness is a signal to look.
 - **Renaming preserves assignments; deleting strips the label off closed
   issues too.** Retire in place instead.

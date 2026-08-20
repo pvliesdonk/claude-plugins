@@ -1,0 +1,22 @@
+{
+  "name": "roadmapping",
+  "version": "1.0.0",
+  "description": "Chart, refine and revisit multi-epic technical roadmaps at a declared resolution. Holds the line against false precision: if you do not have hard evidence you cannot be certain, and it is not your job to obtain that evidence now — assert it, or file it as a known unknown with a resolved-by pointer.",
+  "author": {
+    "name": "Peter van Liesdonk",
+    "email": "peter@liesdonk.nl"
+  },
+  "homepage": "https://github.com/pvliesdonk/claude-plugins/tree/main/plugins/roadmapping",
+  "repository": "https://github.com/pvliesdonk/claude-plugins",
+  "license": "MIT",
+  "keywords": [
+    "roadmap",
+    "planning",
+    "milestones",
+    "epics",
+    "refinement",
+    "research-spike",
+    "sequencing",
+    "workflow"
+  ]
+}

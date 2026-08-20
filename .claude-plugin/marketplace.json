@@ -41,6 +41,17 @@
       "homepage": "https://github.com/pvliesdonk/claude-plugins/tree/main/plugins/preflight-circus"
     },
     {
+      "name": "roadmapping",
+      "description": "Chart, refine and revisit multi-epic technical roadmaps at a declared resolution, holding the line against false precision about work nobody has scoped yet.",
+      "author": {
+        "name": "Peter van Liesdonk",
+        "email": "peter@liesdonk.nl"
+      },
+      "source": "./plugins/roadmapping",
+      "category": "development",
+      "homepage": "https://github.com/pvliesdonk/claude-plugins/tree/main/plugins/roadmapping"
+    },
+    {
       "name": "scholar-mcp",
       "description": "Scholarly-sources MCP server for papers, patents, books, and standards.",
       "homepage": "https://pvliesdonk.github.io/scholar-mcp/",

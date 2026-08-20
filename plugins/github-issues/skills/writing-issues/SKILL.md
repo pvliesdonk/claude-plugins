@@ -16,6 +16,12 @@ If yes — **remove it.** The issue body must contain no proposed approach and n
 
 Companion skill: `github-issues:triaging-issues` covers what to do with an issue that already exists — labels, priority, milestone, closing. Filing is this skill; classifying is that one. Do not label or milestone as part of filing beyond what the issue form applies.
 
+**This skill assumes nothing about the repo.** It is written to work where there are no
+conventions yet and where they differ from anything described here. Where the project
+states a rule — `CONTRIBUTING.md`, an issue form, a documented scheme — **that rule wins
+and this skill is the fallback**; where it states nothing, everything here applies as
+written. Say which of the two you are in before you start.
+
 ## Step 1: Check for a Template (Always Do This First)
 
 ```bash
