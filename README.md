@@ -45,6 +45,12 @@ MCP server for markdown vaults: FTS5 + semantic search, link graph, write/edit/g
 - **Source:** [pvliesdonk/markdown-vault-mcp](https://github.com/pvliesdonk/markdown-vault-mcp)
 - **Homepage:** <https://pvliesdonk.github.io/markdown-vault-mcp/>
 
+### open-knowledge-format
+
+Author, validate, migrate and consume Open Knowledge Format bundles — Google Cloud's vendor-neutral spec for agent-readable knowledge as markdown with YAML frontmatter, with a conformance validator.
+
+- **Source:** [`plugins/open-knowledge-format`](plugins/open-knowledge-format) — in this repository
+
 ### preflight-circus
 
 A blind six-lens review gate over BASE..HEAD, run before you push rather than after — the same examination a post-push review bot applies, sat while the diff is still local.

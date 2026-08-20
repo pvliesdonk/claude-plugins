@@ -1,0 +1,22 @@
+{
+  "name": "open-knowledge-format",
+  "version": "1.0.0",
+  "description": "Author, validate, migrate and consume Open Knowledge Format bundles — Google Cloud's vendor-neutral spec (v0.2) for agent-readable knowledge as markdown with YAML frontmatter. Ships a field reference, the Attested Computation contract, and a conformance validator.",
+  "author": {
+    "name": "Peter van Liesdonk",
+    "email": "peter@liesdonk.nl"
+  },
+  "homepage": "https://github.com/pvliesdonk/claude-plugins/tree/main/plugins/open-knowledge-format",
+  "repository": "https://github.com/pvliesdonk/claude-plugins",
+  "license": "MIT",
+  "keywords": [
+    "okf",
+    "open-knowledge-format",
+    "knowledge-bundle",
+    "agent-knowledge",
+    "markdown",
+    "frontmatter",
+    "attested-computation",
+    "provenance"
+  ]
+}

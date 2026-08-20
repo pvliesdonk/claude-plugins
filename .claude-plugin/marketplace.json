@@ -41,6 +41,17 @@
       "version": "3.1.0"
     },
     {
+      "name": "open-knowledge-format",
+      "description": "Author, validate, migrate and consume Open Knowledge Format bundles — Google Cloud's vendor-neutral spec for agent-readable knowledge as markdown with YAML frontmatter, with a conformance validator.",
+      "author": {
+        "name": "Peter van Liesdonk",
+        "email": "peter@liesdonk.nl"
+      },
+      "source": "./plugins/open-knowledge-format",
+      "category": "development",
+      "homepage": "https://github.com/pvliesdonk/claude-plugins/tree/main/plugins/open-knowledge-format"
+    },
+    {
       "name": "preflight-circus",
       "description": "A blind six-lens review gate over BASE..HEAD, run before you push rather than after — the same examination a post-push review bot applies, sat while the diff is still local.",
       "author": {
