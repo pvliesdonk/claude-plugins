@@ -1,0 +1,22 @@
+{
+  "name": "code-archaeology",
+  "version": "1.0.0",
+  "description": "Work out what happened and why, from what a project left behind. Establishes ground truth before trusting any history query, walks the line-to-commit-to-PR-to-issue chain through the places each hop breaks, and refuses to fill a gap with a plausible reconstruction. Assumes only git.",
+  "author": {
+    "name": "Peter van Liesdonk",
+    "email": "peter@liesdonk.nl"
+  },
+  "homepage": "https://github.com/pvliesdonk/claude-plugins/tree/main/plugins/code-archaeology",
+  "repository": "https://github.com/pvliesdonk/claude-plugins",
+  "license": "MIT",
+  "keywords": [
+    "git",
+    "history",
+    "archaeology",
+    "git-blame",
+    "investigation",
+    "postmortem",
+    "onboarding",
+    "rationale"
+  ]
+}
