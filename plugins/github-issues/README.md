@@ -90,6 +90,13 @@ matrix, because none of the three can do everything:
 - in the API and MCP paths, `labels` **replaces** the whole set rather than
   appending, and `milestone` takes a number where `gh` takes a title
 
+## The other half
+
+`code-archaeology` is the excavation side: how someone later reconstructs what happened
+and why. Its rules read backwards as a specification for this one — the motivating
+problem, who reported it, the alternative rejected, and why something was removed are
+exactly the things no diff can reconstruct, which is why they have to be written here.
+
 ## Tests
 
 Each skill ships its pressure scenarios under `tests/`, with the baseline

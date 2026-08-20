@@ -7,6 +7,17 @@
   "description": "Claude Code plugins by pvliesdonk: MCP servers for markdown vaults, academic literature and image generation, plus development-workflow tooling.",
   "plugins": [
     {
+      "name": "code-archaeology",
+      "description": "Work out what happened and why, from what a project left behind — establishing ground truth before trusting any history query, and refusing to fill a gap with a plausible reconstruction.",
+      "author": {
+        "name": "Peter van Liesdonk",
+        "email": "peter@liesdonk.nl"
+      },
+      "source": "./plugins/code-archaeology",
+      "category": "development",
+      "homepage": "https://github.com/pvliesdonk/claude-plugins/tree/main/plugins/code-archaeology"
+    },
+    {
       "name": "github-issues",
       "description": "Two disciplines for GitHub issues: writing one that records an observation rather than a work order, and triaging a backlog within the label scheme that exists rather than redesigning it.",
       "author": {
