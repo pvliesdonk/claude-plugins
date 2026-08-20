@@ -7,8 +7,9 @@ description: Use when filing a bug, opening or creating a GitHub issue, drafting
 
 Two documents, written at opposite ends of the work: the **issue** that opens it and the
 **pull request description** that closes it. Both are read by someone without your
-context, and both fail the same way — claiming more confidence than you earned, and
-omitting what you left out.
+context — a reviewer now, or someone reconstructing intent years later — and both
+fail the same way: claiming more confidence than you earned, and omitting what you
+left out.
 
 Steps 1–2 and the rules below are for issues; **Pull Request Descriptions** is the
 second half.
@@ -73,6 +74,13 @@ When you have not verified the cause, this sentence is **required**:
 
 The implementer must inherit your doubt, not a false floor of confidence.
 
+## The Issue Is Where "Why" Survives
+
+The motivating problem and the name of whoever reported it exist in the issue or
+nowhere: a commit records neither, and `git log` credits the implementer rather than
+the reporter. Write the problem in the reporter's terms, and quote them where you can.
+See **Writing for the archaeologist** below for what else is unrecoverable.
+
 ## Scope Rule: One Issue, One Observed Problem
 
 If you notice a second suspected problem while writing: do not add it to the body. If you genuinely suspect it shares a code path, add exactly one line under Open Questions: `[unverified]: <suspected problem> may share this code path`. Open a separate issue for it after this one.
@@ -80,12 +88,19 @@ If you notice a second suspected problem while writing: do not add it to the bod
 ## Pull Request Descriptions
 
 An issue is written before the work, for whoever picks it up. A PR description is
-written after it, for one reader: the person deciding whether to trust the diff.
+written after it, for **two** readers who need different things from the same
+document:
 
-It carries what the diff cannot. **Git history shows how the change *was* made and
-never how it *wasn't*** — the alternative you rejected, the scope you deferred, and
-the part you are least sure of exist nowhere else. That is the whole reason to write
-one, and it is the part reviewers actually use.
+- the **reviewer**, deciding this week whether to trust the diff;
+- the **archaeologist** — anyone, including you, asking in two years why the code is
+  like this.
+
+The reviewer reads it once. The archaeologist is why it outlives the review.
+
+Both are served by the same thing: it carries what the diff cannot. **Git history
+shows how the change *was* made and never how it *wasn't*** — the alternative you
+rejected, the scope you deferred, and the part you were least sure of exist nowhere
+else.
 
 ### First: it describes the diff that exists
 
@@ -113,6 +128,40 @@ Five parts, in this order:
 5. **What you ran** — the commands, and their result.
 
 If the project links PRs to issues, reference the one this serves.
+
+### Writing for the archaeologist
+
+Someone will land on a line of code and ask why. The chain they follow is
+**line → commit → pull request → issue → discussion**, and every hop is a link that
+has to exist because you made it.
+
+Two things break that chain in practice:
+
+- **`git blame` usually lands on a refactor.** Reformatting, renames and code movement
+  overwrite authorship, so the commit it finds is rarely the one that decided anything.
+  The PR is where the reasoning is; blame is only the way in.
+- **A prose mention is not a link.** "fixes the thing from #123" reads fine and is
+  invisible to every tool that walks these relationships. Use the real closing
+  reference (`Closes #123` in the PR body, or the UI's link), and for an epic use
+  native sub-issues rather than a markdown checklist — the link is queryable, a
+  checklist is prose.
+
+Then write down the things that are **unrecoverable** if you don't. None of these can
+be reconstructed from the diff by anyone, however careful:
+
+| What | Why it vanishes |
+|------|-----------------|
+| The motivating problem | Never in a commit. It lives in the issue or nowhere. |
+| Who asked for it | Commit authorship credits the implementer. Whoever reported it is invisible in `git log`. |
+| The alternative you rejected | Leaves no trace at all — the code shows only what you chose. |
+| What you deliberately did not do | Absence is indistinguishable from oversight. |
+| Why something was **removed** | The hardest case: there is no code left to blame. |
+| Whether it was a breaking change, and your reasoning | Conventional-commit markers are unreliable in both directions; the reasoning is the durable part. |
+
+A decision recorded nowhere gets re-litigated, or quietly contradicted by someone who
+never knew it was made. If a rejected alternative was genuinely load-bearing — you
+expect someone to propose it again — it has outgrown the PR body and wants a decision
+record the project keeps.
 
 ### Verification is a report, not a checklist
 
@@ -147,6 +196,7 @@ description.
 | "Refactored for clarity" | Name what was wrong before |
 | The issue title restated as the summary | The issue states the problem; the PR states the resolution |
 | "Should be safe" / "minor change" | Say what you checked, or say you did not check |
+| "fixes the thing from #123" as the only link | Use a real closing reference; a prose mention is invisible to every tool that walks these links |
 
 ## Common Mistakes — Remove Before Posting an Issue
 
