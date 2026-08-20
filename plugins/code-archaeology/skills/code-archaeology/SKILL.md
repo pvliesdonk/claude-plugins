@@ -46,6 +46,22 @@ Worse, a shallow clone lies about its own shape: the graft boundary is parentles
 first commit. An archaeologist who trusts it dates the project from a commit that is
 nowhere near the beginning.
 
+**And it does not only hide evidence — it manufactures it.** A boundary commit has no
+parent, so git renders its *entire tree* as newly added, and a pickaxe matches it for
+every string in the repository. Measured: on a shallow clone, `git log --all -S'<var>'`
+returned ten commits, four of them boundary commits reporting "275 files changed, 94,482
+insertions(+)". None of those four ever touched the variable, and the two commits that
+actually introduced and renamed it were absent entirely. The naive reading — that the
+variable arrived in a docs commit — is confidently wrong rather than merely incomplete.
+
+Spot them by cross-checking the hits against the boundary list:
+
+```bash
+comm -12 <(git log --all --format=%H -S'<string>' | sort) <(sort .git/shallow)
+```
+
+Any overlap means those hits are artifacts. Deepen the clone and re-run.
+
 So, before trusting anything:
 
 ```bash
@@ -212,6 +228,7 @@ An answer that lives only in a chat log has not been recorded.
 | What happened | What to do instead |
 |---|---|
 | Ran history queries without checking for a shallow clone | `git rev-parse --is-shallow-repository` first; `--unshallow` before trusting anything |
+| Trusted pickaxe hits on a shallow clone | Boundary commits match every string; cross-check hits against `.git/shallow` |
 | Ran `--unshallow` during a read-only investigation | It is a write. Ask, or use the forge API, or scope your claims to the history you have |
 | Scoped to `HEAD` and reported a complete answer | Use `--all`, and say which scope you searched |
 | "This never existed" / "first introduced in X" from a partial search | Prove the search space, or weaken the claim |
