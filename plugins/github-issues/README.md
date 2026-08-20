@@ -20,7 +20,7 @@ picks the issue up inherits a false floor of confidence.
 
 | Skill | Use when | Refuses to |
 | --- | --- | --- |
-| `writing-issues` | the issue does not exist yet — a bug to file, a finding from review, a ticket to draft | assert a cause, propose a fix, or bundle a second problem into one body |
+| `writing-issues` | you are writing prose *about* a change — the issue that opens the work, or the PR description that closes it | assert a cause you did not verify, claim a check you did not run, or describe a diff other than the one you have |
 | `triaging-issues` | the issue exists — labels, priority, milestone, a backlog sweep, or a label set gone to seed | derive priorities from titles, redesign the taxonomy mid-sweep, or delete a label without counting what it strips |
 
 They are deliberately separate. Writing is about a body you are composing;
@@ -30,27 +30,46 @@ writing wants the form's fields, triage wants its label vocabulary.
 
 ## writing-issues
 
-The rule is **observation, not work order.** The body records what was seen;
-it does not diagnose, design, or prescribe. Every cause statement carries
-`[verified: how]` or `[unverified]`, and an unverified cause requires the
-sentence "I have not verified the cause" — so the reader inherits the doubt
-rather than a confident-sounding guess.
+Covers both documents written around a change, at opposite ends of the work.
 
-Also enforces one issue per observed problem, and fills the repo's own issue
-form when one exists rather than inventing fields.
+**Issues.** The rule is **observation, not work order.** The body records what
+was seen; it does not diagnose, design, or prescribe. Every cause statement
+carries `[verified: how]` or `[unverified]`, and an unverified cause requires
+the sentence "I have not verified the cause" — so the reader inherits the doubt
+rather than a confident-sounding guess. One issue per observed problem, and the
+repo's own form is filled rather than replaced.
+
+**Pull request descriptions.** Written for one reader: whoever decides whether
+to trust the diff. A description carries what the diff cannot — *git history
+shows how a change was made and never how it wasn't*, so the rejected
+alternative, the deferred scope and the part you are least sure of exist
+nowhere else.
+
+Its first rule is that the description matches **the diff that exists**. If the
+diff contains something you no longer think should ship, change the diff rather
+than describing it away — a "deliberately does not do" entry naming something
+the diff *does* is the most dangerous sentence a PR body can carry, because it
+reads as scrupulous honesty and quietly discredits every other claim beside it.
+
+Then a five-part shape (what changes, why this way including what you rejected,
+where to look first, what it deliberately does not do with real issue numbers,
+and what you actually ran), plus verification-is-a-report, annotate-the-diff,
+and the size limits past which review quality collapses.
 
 ## triaging-issues
 
 The rule is **classify within the scheme, don't redesign it.** Triage answers
-four questions — what kind, whose area, how urgent, which release — and a
+four questions — what kind, whose area, how urgent, and when — and a
 triaged issue carries exactly one type label, zero or more area labels, one
 priority or none deliberately, and zero or more status labels.
 
 Load-bearing distinctions it holds:
 
-- **A milestone is a commitment, not a category.** Labels say what an issue
-  *is*; a milestone says *when it ships*, and many projects gate "safe to cut
-  a release" on milestone emptiness. Absence of a milestone is the backlog.
+- **Establish what a milestone means here before touching one.** Under the
+  release-payload convention it is a shipping commitment, often gating "safe to
+  cut a release", and absence of one is the backlog. Under the epic convention
+  (`roadmapping`) it is a body of intent being refined, and stripping it as
+  speculative destroys the roadmap. The skill names both and refuses to guess.
 - **Close on a reason, never on age.** Staleness is a signal to look.
 - **Renaming preserves assignments; deleting strips the label off closed
   issues too.** Retire in place instead.

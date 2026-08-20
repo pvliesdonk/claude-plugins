@@ -7,7 +7,7 @@ description: Use when sorting or cleaning up a GitHub issue backlog, deciding an
 
 ## The Rule: Classify Within the Scheme, Don't Redesign It
 
-Triage answers four questions about an issue: **what kind, whose area, how urgent, which release.** That is all.
+Triage answers four questions about an issue: **what kind, whose area, how urgent, and when.** That is all.
 
 **STOP. Before you touch anything:**
 > Am I about to redesign the label set, or diagnose the bug?
@@ -15,6 +15,12 @@ Triage answers four questions about an issue: **what kind, whose area, how urgen
 Both mean you have stopped triaging. Redesigning the taxonomy is a separate task with its own risks (below). Diagnosing belongs to whoever picks the issue up.
 
 Companion skill: `github-issues:writing-issues` covers how to *write* an issue — reach for it when the issue does not exist yet. This one is for issues that already do.
+
+**This skill assumes nothing about the repo.** It is written to work where there are no
+conventions yet and where they differ from anything described here. Where the project
+states a rule — `CONTRIBUTING.md`, an issue form, a documented scheme — **that rule wins
+and this skill is the fallback**; where it states nothing, everything here applies as
+written. Say which of the two you are in before you start.
 
 ## Step 1: Read the Taxonomy Before You Label Anything
 
@@ -52,15 +58,22 @@ Four axes, and that is the whole output. Two type labels on one issue is the mos
 
 If you find yourself adding a fifth kind of thing, you are inventing taxonomy — stop and see Curating below.
 
-## Milestones Are a Commitment, Not a Category
+## Milestones: Read What They Mean Here First
 
-Labels say **what an issue is** (many per issue). A milestone says **when it ships** (one per issue, and a human decided).
+Labels say **what an issue is** (many per issue). A milestone says something about *when* — but **what exactly varies by project**, and guessing is destructive in both directions. Establish the scheme before you touch one:
 
-Assign a milestone only when **both** hold:
+| Scheme | A milestone is | Tell |
+|---|---|---|
+| Release payload | the work committed to a named release | titled like a version (`v4.1`); often "safe to cut" = no open issues in it |
+| Epic / idea | a body of intent being refined into features | titled like a theme; carries an acceptance criterion and a refinement issue |
+
+`CONTRIBUTING.md`, `CLAUDE.md`, and the existing milestone titles tell you which. **Where milestones are epics, never strip one as speculative** — an unshipped milestone there is the roadmap, not a wishlist entry, and the rest of this section does not apply to it.
+
+Everything below is the **release-payload** scheme. Under it, assign a milestone only when **both** hold:
 1. You can name the release it ships in, and
 2. the work is actually committed to that release.
 
-If you cannot name the release, leave it off. **Absence of a milestone is the backlog** — that is what the backlog is. A milestone holding every open issue is a wish list, and it destroys the only question milestones answer.
+If you cannot name the release, leave it off. **Absence of a milestone is the backlog** — that is what the backlog is, under this scheme. A milestone holding every open issue is a wish list, and it destroys the only question milestones answer.
 
 Many projects gate releases on milestone emptiness ("safe to cut = no open issues in the milestone"). Where that is true, **adding a milestone blocks a release** — always confirm it. Check `CONTRIBUTING.md` before assuming it isn't true here.
 
@@ -126,7 +139,8 @@ This is the destructive part. Separate it from a triage sweep; do not bundle the
 | "The taxonomy is a mess, I should fix it first" | Triage and curation are different tasks with different risk. Do the sweep within the scheme that exists; propose curation separately. |
 | "The titles are descriptive enough" | Titles give you type. They do not give you severity, liveness, or duplicates. |
 | "It's obviously low priority" | Priority is the maintainer's call about their own time. Propose it. |
-| "A milestone will help organise the backlog" | That is what labels are for. A milestone is a shipping commitment, often a release gate. |
+| "A milestone will help organise the backlog" | That is what labels are for. Under the release-payload scheme a milestone is a shipping commitment, often a release gate. |
+| "This milestone has no release date, so it is speculative" | Or the project uses milestones as epics. Establish the scheme before stripping anything. |
 | "This issue is ancient, close it" | Age is not a reason. Find a reason or leave it open. |
 | "I'll just add both labels to be safe" | Two type labels means the axis no longer answers anything. Pick one. |
 | "The label list I was given is the taxonomy" | Re-read it live with `--limit 200`. Pasted lists and truncated ones are how duplicate labels get created. |
@@ -142,6 +156,7 @@ This is the destructive part. Separate it from a triage sweep; do not bundle the
 - `bug` and `question` (or any two types) on the same issue
 - A closing comment that does not name a reason
 - A bare `gh label list` or `gh issue list` in your triage transcript
+- A milestone added or removed before you established what milestones mean in this repo
 - Anything in your apply-directly block that is not one of the three listed operations
 
 ## Mechanics
