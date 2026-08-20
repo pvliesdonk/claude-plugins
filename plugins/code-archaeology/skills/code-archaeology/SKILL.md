@@ -37,9 +37,10 @@ git rev-list --count HEAD               # vs...
 git rev-list --count --all              # ...everything the object store actually holds
 ```
 
-**The shallow-clone trap, measured on a real repository:** 163 commits reachable from
-`HEAD`, 1637 from `--all`. The same pickaxe query returned **1 hit scoped to `HEAD` and
-11 with `--all`**. Nothing warned; both answers looked authoritative.
+**The shallow-clone trap, reproducible.** On a `git clone --depth 50` of a real
+repository: 305 commits reachable from `HEAD`, 1269 from `--all`. The pickaxe
+`git log -S'READY_TIMEOUT_S'` returns **5 hits scoped to `HEAD` and 10 across `--all`**.
+Nothing warned; both answers looked authoritative.
 
 Worse, a shallow clone lies about its own shape: the graft boundary is parentless, so
 `git rev-list --max-parents=0 HEAD` reports a mid-history refactor as the project's
@@ -48,11 +49,11 @@ nowhere near the beginning.
 
 **And it does not only hide evidence — it manufactures it.** A boundary commit has no
 parent, so git renders its *entire tree* as newly added, and a pickaxe matches it for
-every string in the repository. Measured: on a shallow clone, `git log --all -S'<var>'`
-returned ten commits, four of them boundary commits reporting "275 files changed, 94,482
-insertions(+)". None of those four ever touched the variable, and the two commits that
-actually introduced and renamed it were absent entirely. The naive reading — that the
-variable arrived in a docs commit — is confidently wrong rather than merely incomplete.
+every string in the repository. On the same clone, **4 of those 10 `--all` hits are
+boundary commits**, each reporting "275 files changed, 94,482 insertions(+)". None of
+the four ever touched the variable, and the two commits that actually introduced and
+renamed it are absent from the result entirely. The naive reading — that the variable
+arrived in a docs commit — is confidently wrong rather than merely incomplete.
 
 Spot them by cross-checking the hits against the boundary list:
 

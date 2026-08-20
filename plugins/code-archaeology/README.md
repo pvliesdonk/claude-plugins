@@ -23,8 +23,10 @@ later mechanical changelog regeneration.
 Both were also working in a **shallow clone**, and neither noticed.
 
 Every key commit they cited was unreachable from `HEAD` — present only because tags
-held the objects. The same pickaxe query returns 2 hits scoped to `HEAD` and 13 across
-all refs; 163 commits are reachable one way and 1637 the other. Nothing errors. The
+held the objects. The effect reproduces on any shallow clone: `git clone --depth 50` of
+that repository reaches 305 commits from `HEAD` against 1269 from `--all`, and
+`git log -S'READY_TIMEOUT_S'` returns 5 hits one way and 10 the other — four of those
+ten being boundary artifacts that never touched the variable at all. Nothing errors. The
 answers happened to be right, and would have been reported with identical confidence
 had they been wrong.
 

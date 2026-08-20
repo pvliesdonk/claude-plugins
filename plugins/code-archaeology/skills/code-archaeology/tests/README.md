@@ -20,6 +20,17 @@ cited was unreachable from `HEAD`, present only because tags held the objects:
     -S READY_TIMEOUT   HEAD-only: 2 hits   --all: 13 hits
     -S bucket in src/  HEAD-only: 3 hits   --all: 27 hits
 
+Those figures describe the clone the baseline runs were handed; it has since been
+deepened, so they are not reproducible as they stand. To recreate an equivalent
+condition:
+
+    git clone --depth 50 --no-single-branch <repo> fixture
+    # 305 commits from HEAD, 1269 from --all
+    # -S'READY_TIMEOUT_S' -> 5 hits HEAD-only, 10 with --all, 4 of them boundary artifacts
+
+Give every rep its own copy: an agent that runs `git fetch --unshallow` repairs the
+condition for every other rep sharing the directory.
+
 The failure is not weak evidence. It is **unestablished completeness** — and both runs
 then made negative and superlative claims ("never appeared in any released version",
 "zero hits, all tags") that the documented method did not support.
