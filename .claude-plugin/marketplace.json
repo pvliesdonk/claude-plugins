@@ -75,15 +75,15 @@
     },
     {
       "name": "scholar-mcp",
-      "description": "Scholarly-sources MCP server for papers, patents, books, and standards.",
+      "description": "FastMCP server for scholarly sources (papers, patents, books, and standards) with metadata enrichment and docling PDF conversion",
       "homepage": "https://pvliesdonk.github.io/scholar-mcp/",
       "source": {
         "source": "git-subdir",
         "url": "https://github.com/pvliesdonk/scholar-mcp.git",
         "path": ".claude-plugin/plugin",
-        "ref": "v1.9.0"
+        "ref": "v1.9.1"
       },
-      "version": "1.9.0"
+      "version": "1.9.1"
     }
   ]
 }

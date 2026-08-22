@@ -65,7 +65,7 @@ Chart, refine and revisit multi-epic technical roadmaps at a declared resolution
 
 ### scholar-mcp
 
-Scholarly-sources MCP server for papers, patents, books, and standards.
+FastMCP server for scholarly sources (papers, patents, books, and standards) with metadata enrichment and docling PDF conversion
 
 - **Source:** [pvliesdonk/scholar-mcp](https://github.com/pvliesdonk/scholar-mcp)
 - **Homepage:** <https://pvliesdonk.github.io/scholar-mcp/>
