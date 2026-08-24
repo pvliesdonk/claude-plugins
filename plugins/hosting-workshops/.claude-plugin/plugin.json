@@ -1,0 +1,21 @@
+{
+  "name": "hosting-workshops",
+  "version": "1.0.0",
+  "description": "Design and facilitate workshops, trainings, retrospectives, design sprints, threat-modeling sessions, and other structured group sessions.",
+  "author": {
+    "name": "Peter van Liesdonk",
+    "email": "peter@liesdonk.nl"
+  },
+  "homepage": "https://github.com/pvliesdonk/claude-plugins/tree/main/plugins/hosting-workshops",
+  "repository": "https://github.com/pvliesdonk/claude-plugins",
+  "license": "MIT",
+  "keywords": [
+    "workshop",
+    "facilitation",
+    "retrospective",
+    "training",
+    "design-sprint",
+    "threat-modeling",
+    "co-creation"
+  ]
+}

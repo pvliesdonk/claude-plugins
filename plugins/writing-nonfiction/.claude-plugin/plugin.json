@@ -1,0 +1,21 @@
+{
+  "name": "writing-nonfiction",
+  "version": "1.0.0",
+  "description": "Draft, structure, and revise nonfiction for real readers across proposals, papers, white papers, blog posts, explainers, handbooks, and software documentation.",
+  "author": {
+    "name": "Peter van Liesdonk",
+    "email": "peter@liesdonk.nl"
+  },
+  "homepage": "https://github.com/pvliesdonk/claude-plugins/tree/main/plugins/writing-nonfiction",
+  "repository": "https://github.com/pvliesdonk/claude-plugins",
+  "license": "MIT",
+  "keywords": [
+    "writing",
+    "nonfiction",
+    "documentation",
+    "proposals",
+    "scientific-writing",
+    "white-paper",
+    "editing"
+  ]
+}
