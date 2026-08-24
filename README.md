@@ -38,6 +38,12 @@ Two disciplines for GitHub issues: writing one that records an observation rathe
 
 - **Source:** [`plugins/github-issues`](plugins/github-issues) — in this repository
 
+### hosting-workshops
+
+Design and facilitate workshops, trainings, retrospectives, design sprints, threat-modeling sessions, and other structured group sessions.
+
+- **Source:** [`plugins/hosting-workshops`](plugins/hosting-workshops) — in this repository
+
 ### markdown-vault-mcp
 
 MCP server for markdown vaults: FTS5 + semantic search, link graph, write/edit/git.
@@ -57,6 +63,12 @@ A blind six-lens review gate over BASE..HEAD, run before you push rather than af
 
 - **Source:** [`plugins/preflight-circus`](plugins/preflight-circus) — in this repository
 
+### refactor-audit
+
+Audit a Python codebase with complexity, churn, smell, and dead-code signals, then rank a focused refactoring triage shortlist without editing the target.
+
+- **Source:** [`plugins/refactor-audit`](plugins/refactor-audit) — in this repository
+
 ### roadmapping
 
 Chart, refine and revisit multi-epic technical roadmaps at a declared resolution, holding the line against false precision about work nobody has scoped yet.
@@ -69,6 +81,12 @@ FastMCP server for scholarly sources (papers, patents, books, and standards) wit
 
 - **Source:** [pvliesdonk/scholar-mcp](https://github.com/pvliesdonk/scholar-mcp)
 - **Homepage:** <https://pvliesdonk.github.io/scholar-mcp/>
+
+### writing-nonfiction
+
+Draft, structure, and revise nonfiction for real readers across proposals, papers, white papers, blog posts, explainers, handbooks, and software documentation.
+
+- **Source:** [`plugins/writing-nonfiction`](plugins/writing-nonfiction) — in this repository
 
 <!-- GENERATED-PLUGIN-LIST-END -->
 

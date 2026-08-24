@@ -1,0 +1,21 @@
+{
+  "name": "refactor-audit",
+  "version": "1.0.0",
+  "description": "Audit a Python codebase with complexity, churn, smell, and dead-code signals, then rank a focused refactoring triage shortlist without editing the target.",
+  "author": {
+    "name": "Peter van Liesdonk",
+    "email": "peter@liesdonk.nl"
+  },
+  "homepage": "https://github.com/pvliesdonk/claude-plugins/tree/main/plugins/refactor-audit",
+  "repository": "https://github.com/pvliesdonk/claude-plugins",
+  "license": "MIT",
+  "keywords": [
+    "refactoring",
+    "technical-debt",
+    "python",
+    "complexity",
+    "code-quality",
+    "static-analysis",
+    "churn"
+  ]
+}

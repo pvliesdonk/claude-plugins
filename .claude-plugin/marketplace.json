@@ -29,6 +29,17 @@
       "homepage": "https://github.com/pvliesdonk/claude-plugins/tree/main/plugins/github-issues"
     },
     {
+      "name": "hosting-workshops",
+      "description": "Design and facilitate workshops, trainings, retrospectives, design sprints, threat-modeling sessions, and other structured group sessions.",
+      "author": {
+        "name": "Peter van Liesdonk",
+        "email": "peter@liesdonk.nl"
+      },
+      "source": "./plugins/hosting-workshops",
+      "category": "productivity",
+      "homepage": "https://github.com/pvliesdonk/claude-plugins/tree/main/plugins/hosting-workshops"
+    },
+    {
       "name": "markdown-vault-mcp",
       "description": "MCP server for markdown vaults: FTS5 + semantic search, link graph, write/edit/git.",
       "homepage": "https://pvliesdonk.github.io/markdown-vault-mcp/",
@@ -63,6 +74,17 @@
       "homepage": "https://github.com/pvliesdonk/claude-plugins/tree/main/plugins/preflight-circus"
     },
     {
+      "name": "refactor-audit",
+      "description": "Audit a Python codebase with complexity, churn, smell, and dead-code signals, then rank a focused refactoring triage shortlist without editing the target.",
+      "author": {
+        "name": "Peter van Liesdonk",
+        "email": "peter@liesdonk.nl"
+      },
+      "source": "./plugins/refactor-audit",
+      "category": "development",
+      "homepage": "https://github.com/pvliesdonk/claude-plugins/tree/main/plugins/refactor-audit"
+    },
+    {
       "name": "roadmapping",
       "description": "Chart, refine and revisit multi-epic technical roadmaps at a declared resolution, holding the line against false precision about work nobody has scoped yet.",
       "author": {
@@ -84,6 +106,17 @@
         "ref": "v1.9.1"
       },
       "version": "1.9.1"
+    },
+    {
+      "name": "writing-nonfiction",
+      "description": "Draft, structure, and revise nonfiction for real readers across proposals, papers, white papers, blog posts, explainers, handbooks, and software documentation.",
+      "author": {
+        "name": "Peter van Liesdonk",
+        "email": "peter@liesdonk.nl"
+      },
+      "source": "./plugins/writing-nonfiction",
+      "category": "writing",
+      "homepage": "https://github.com/pvliesdonk/claude-plugins/tree/main/plugins/writing-nonfiction"
     }
   ]
 }
