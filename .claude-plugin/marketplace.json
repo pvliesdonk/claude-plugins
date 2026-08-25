@@ -117,6 +117,18 @@
       "source": "./plugins/writing-nonfiction",
       "category": "writing",
       "homepage": "https://github.com/pvliesdonk/claude-plugins/tree/main/plugins/writing-nonfiction"
+    },
+    {
+      "name": "paperless-mcp",
+      "description": "Paperless-NGX document management over MCP: search, tag, upload, and read documents; manage tags, correspondents, document types, and custom fields.",
+      "homepage": "https://pvliesdonk.github.io/paperless-mcp/",
+      "source": {
+        "source": "git-subdir",
+        "url": "https://github.com/pvliesdonk/paperless-mcp.git",
+        "path": ".claude-plugin/plugin",
+        "ref": "v1.0.2"
+      },
+      "version": "1.0.2"
     }
   ]
 }

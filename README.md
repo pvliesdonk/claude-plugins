@@ -88,6 +88,13 @@ Draft, structure, and revise nonfiction for real readers across proposals, paper
 
 - **Source:** [`plugins/writing-nonfiction`](plugins/writing-nonfiction) — in this repository
 
+### paperless-mcp
+
+Paperless-NGX document management over MCP: search, tag, upload, and read documents; manage tags, correspondents, document types, and custom fields.
+
+- **Source:** [pvliesdonk/paperless-mcp](https://github.com/pvliesdonk/paperless-mcp)
+- **Homepage:** <https://pvliesdonk.github.io/paperless-mcp/>
+
 <!-- GENERATED-PLUGIN-LIST-END -->
 
 ## License
