@@ -46,7 +46,7 @@ Design and facilitate workshops, trainings, retrospectives, design sprints, thre
 
 ### markdown-vault-mcp
 
-MCP server for markdown vaults: FTS5 + semantic search, link graph, write/edit/git.
+Generic markdown vault MCP server with FTS5 + semantic search
 
 - **Source:** [pvliesdonk/markdown-vault-mcp](https://github.com/pvliesdonk/markdown-vault-mcp)
 - **Homepage:** <https://pvliesdonk.github.io/markdown-vault-mcp/>
