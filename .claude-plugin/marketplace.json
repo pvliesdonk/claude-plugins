@@ -41,15 +41,15 @@
     },
     {
       "name": "markdown-vault-mcp",
-      "description": "Generic markdown vault MCP server with FTS5 + semantic search",
+      "description": "Generic markdown vault MCP with hybrid search",
       "homepage": "https://pvliesdonk.github.io/markdown-vault-mcp/",
       "source": {
         "source": "git-subdir",
         "url": "https://github.com/pvliesdonk/markdown-vault-mcp.git",
         "path": ".claude-plugin/plugin",
-        "ref": "v4.0.0"
+        "ref": "v4.1.0"
       },
-      "version": "4.0.0"
+      "version": "4.1.0"
     },
     {
       "name": "open-knowledge-format",
