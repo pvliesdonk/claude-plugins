@@ -16,4 +16,5 @@ and what is contested, and names an optional source corpus note for depth.
 | `tool-titles-and-annotation.md` | writing the title and the annotation layer: the highest-leverage, least-policed channel in the artefact |
 | `tool-recutting.md` | the work exists and the audience changed — what stays invariant, and when to start again from the material |
 | `tool-honesty.md` | telling legitimate emphasis from quiet persuasion, and knowing what is demonstrated to mislead |
+| `tool-colour-and-access.md` | choosing a colour family, and checking what the artefact loses in greyscale, on a projector, or to a reader who cannot see it |
 | `tool-when-not-to-draw.md` | deciding whether a picture is warranted at all, and running a critique in the order that can catch real failures |
