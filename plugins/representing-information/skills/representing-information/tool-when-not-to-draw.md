@@ -1,9 +1,8 @@
 # When Not to Draw, and How to Critique
 
-Nobody was ever praised for the chart they did not make, which is why this is the note practitioners
-write least. The request "what chart should this be?" arrives already answered in one respect — that
-it should be a chart. It should not always be a chart. And when one exists, the order in which you
-review it decides whether the review is worth running.
+Nobody was ever praised for the chart they did not make. "What chart should this be?" arrives already
+answered in one respect — that it should be a chart. It should not always be one. And when one
+exists, the order you review it in decides whether the review is worth running.
 
 ## The move — cognitive fit
 **Cognitive fit is the one real theory here**, and unusually strong: it reconciled a contradictory
@@ -21,12 +20,11 @@ Worth holding, and best made by Gelman — who co-authored the pro-graph demonst
 the adversarial case against his own position:
 
 - **Exactness** — a table gives the number; a graph gives a position to estimate from, with error.
-- **Checkability** — a table can be audited, recomputed and re-analysed by someone who disbelieves you.
+- **Checkability** — a table can be audited and recomputed by someone who disbelieves you.
 - **No imposed smoothing** — every graph embeds the author's binning, scaling and framing choices.
-- **Survival under decontextualisation** — a table screenshot pasted into an email still means what it meant.
+- **Survival under decontextualisation** — a table pasted into an email still means what it meant.
 
-"Graphs beat tables" is a live disagreement, not a settled question. The practitioner who knows only
-one side argues badly.
+"Graphs beat tables" is a live disagreement, not a settled question; knowing only one side argues badly.
 
 ## Apply it — the ladder
 Take the first form that carries the finding.
@@ -50,18 +48,17 @@ item on a craft checklist sits at the encoding level**, so a checklist is struct
 failing a chart for answering the wrong question. Score a beautifully formatted wrong answer and you
 get a high score.
 
-1. **Task.** Hand the artefact to an **unbriefed** critic and have them state, in their own words,
-   what question it answers and what decision that feeds. Compare against the Question line of your
-   pre-brief. Divergence is an **abstraction** failure — and you stop. Encoding feedback on a chart
-   failing gate 1 is not merely premature; it is harmful, because it creates the impression the chart
-   is being improved.
-2. **Takeaway.** Show it for about five seconds, remove it, ask what it said; or give a naive reader
+1. **Task.** An **unbriefed** critic states, in their own words, what question it answers and what
+   decision that feeds. Compare against the pre-brief's Question line. Divergence is an
+   **abstraction** failure — and you stop. Encoding feedback here is not merely premature; it is
+   harmful, because it creates the impression the chart is being improved.
+2. **Takeaway.** Show it for about five seconds, remove it, ask what it said — or give a naive reader
    as long as they like and ask for the finding in one sentence. Compare against the Claim line.
-   Divergence is an **encoding** failure — this is where craft feedback becomes useful. Practitioner
-   doctrine, no experimental base; the five seconds is a convention, not a threshold.
+   Divergence is an **encoding** failure, and craft feedback now becomes useful. Practitioner
+   doctrine, no experimental base; five seconds is a convention, not a threshold.
 3. **Checklist.** Scored, repeatable craft review (Evergreen & Emery's ~24 items). Its real value is
-   catching **regression** across edits or across a team's output. Its item selection is professional
-   judgment, and the 90–100% band is convention, not a validated cut-off.
+   catching **regression** across edits or across a team. Item selection is professional judgment and
+   the 90–100% band is convention, not a validated cut-off.
 
 **Running gate 3 first is the classic waste of a critique** — and the default, because it is the only
 gate that produces a number.

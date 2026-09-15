@@ -6,10 +6,10 @@ move — take the artefact and adjust it — is usually wrong.
 
 ## Start with the honest position
 **No validated framework exists** for tailoring one body of material into multiple audience-specific
-representations. What the literature supplies is adjacent: literacy-by-format interactions, the
-finding that different readers value different semantic content, and task-specific display
-optimality. Everything below is reasoned synthesis — defensible, better than improvising, and a
-reader who asks "what is that based on?" deserves that answer rather than an over-loaded citation.
+representations. The literature supplies only adjacent findings: literacy-by-format interactions,
+that different readers value different semantic content, and task-specific display optimality.
+Everything below is reasoned synthesis — better than improvising, and a reader who asks "what is that
+based on?" deserves that answer rather than an over-loaded citation.
 
 ## The five invariants
 These do not change when the audience does. They are what makes two artefacts versions of one work
@@ -31,16 +31,15 @@ if it changes only how easily the same conclusion is reached, that is adaptation
 **Starting again from the material is often better than deriving a variant, and is a legitimate
 recommendation, not an admission of failure.** Three reasons to distrust the derive instinct:
 
-- **Anchoring and fixation.** Working from one candidate rather than several produces worse
-  outcomes, less divergence and measurable fixation (Dow et al., on real behavioural data). A
-  finished artefact of your own is the strongest possible anchor: every move becomes an edit rather
-  than a decision.
-- **Its decisions are invisible to you.** The first artefact encodes a hundred choices that were
-  right for the first audience and survive unexamined in the second. The expert cannot introspect
-  which of their conventions are conventions, and being warned about the bias does not fix it; only
-  decomposing the task back into steps helps — and returning to the material *is* that decomposition.
+- **Anchoring and fixation.** Working from one candidate rather than several produces worse outcomes,
+  less divergence and measurable fixation (Dow et al., on real behavioural data). A finished artefact
+  of your own is the strongest anchor there is: every move becomes an edit, not a decision.
+- **Its decisions are invisible to you.** The first artefact encodes a hundred choices, right for the
+  first audience, surviving unexamined into the second. The expert cannot introspect which of their
+  conventions are conventions, and warning does not fix it; only decomposing the task into steps
+  helps — and returning to the material *is* that decomposition.
 - **The honest answer is often a different artefact entirely.** A twenty-panel grid and one annotated
-  sentence-with-number are not neighbours in design space; there is no edit sequence between them.
+  sentence-with-number are not neighbours in design space; no edit sequence connects them.
 
 **Derive** when the occasion is genuinely adjacent — same reader type, one step of dwell apart.
 **Restart** when the reader's next action changes. When restarting, put the old artefact away — not

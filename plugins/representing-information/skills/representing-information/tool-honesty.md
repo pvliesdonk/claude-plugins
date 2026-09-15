@@ -17,8 +17,8 @@ persuasion; if it changes only *how easily the same conclusion is reached*, that
 | Aggregating regions to fit the page, split available | Aggregating regions because one undercuts the claim |
 | Uncertainty as a range here, a distribution there | Uncertainty in the technical version, absent from the board version |
 
-The right-hand column is rarely done cynically. It is usually done by someone making the artefact
-"clearer", one edit at a time — which is why a test on the artefact rather than the intention matters.
+The right-hand column is rarely cynical. It is usually someone making the artefact "clearer" one edit
+at a time — which is why the test operates on the artefact, not the intention.
 
 ## Test two — checkability
 **Does the pattern survive the reader checking it, or does it depend on not being checked?** An
@@ -33,17 +33,16 @@ omission plus plausible deniability.
   the title more often than the chart, and a majority still rate the chart impartial (Kong et al.).
   An impeccable encoding under an over-reaching headline passes every design review you run.
 - **Emphasis technique is a demonstrated persuasion technology.** Declutter plus highlight plus
-  connected annotation measurably improves what readers take away and remember — by the same
-  mechanism as a slanted headline. The obligation is not to use it less, but to aim it only at
-  findings you would defend under cross-examination.
-- **Minimalism is itself a viewing code.** High data-ink spareness makes a chart *read* as credible
-  (Hullman & Diakopoulos). Stripping a chart does not discharge disclosure; it can make an
-  undisclosed choice more persuasive by dressing it in the vocabulary of neutrality.
+  connected annotation measurably improves what readers take away — by the same mechanism as a
+  slanted headline. The obligation is not to use it less but to aim it only at findings you would
+  defend under cross-examination.
+- **Minimalism is itself a viewing code.** Spareness makes a chart *read* as credible (Hullman &
+  Diakopoulos), so stripping a chart does not discharge disclosure; it can make an undisclosed choice
+  more persuasive by dressing it in the vocabulary of neutrality.
 - **Walk the four editorial layers and name one omission at each** — data, visual representation,
-  annotation (textual, graphical *and social*), interactivity. If you cannot name one at a layer, you
-  have not looked. Omission is the choice least likely to be explicitly indicated, and the
-  annotation-only audit is the self-serving version.
-- **Diffuse rhetoric reads as neutral** — so "it doesn't feel slanted" is evidence of nothing.
+  annotation (textual, graphical *and social*), interactivity. Omission is the choice least likely to
+  be indicated, and the annotation-only audit is the self-serving version.
+- **Diffuse rhetoric reads as neutral** — "it doesn't feel slanted" is evidence of nothing.
 
 ## What is demonstrated to mislead
 Keep this list separate from the list of things that annoy designers. **Truncated axes,
