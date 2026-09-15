@@ -1,0 +1,21 @@
+{
+  "name": "representing-information",
+  "version": "1.0.0",
+  "description": "Decide what to show, how much, and in what form when presenting data, ontologies, processes or qualitative findings to a particular audience — the judgment behind a visualisation, not the rendering of one.",
+  "author": {
+    "name": "Peter van Liesdonk",
+    "email": "peter@liesdonk.nl"
+  },
+  "homepage": "https://github.com/pvliesdonk/claude-plugins/tree/main/plugins/representing-information",
+  "repository": "https://github.com/pvliesdonk/claude-plugins",
+  "license": "MIT",
+  "keywords": [
+    "visualisation",
+    "data-communication",
+    "audience",
+    "ontology",
+    "information-design",
+    "uncertainty",
+    "knowledge-representation"
+  ]
+}

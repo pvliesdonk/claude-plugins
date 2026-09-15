@@ -8,7 +8,7 @@
   "plugins": [
     {
       "name": "code-archaeology",
-      "description": "Work out what happened and why, from what a project left behind — establishing ground truth before trusting any history query, and refusing to fill a gap with a plausible reconstruction.",
+      "description": "Work out what happened and why, from what a project left behind \u2014 establishing ground truth before trusting any history query, and refusing to fill a gap with a plausible reconstruction.",
       "author": {
         "name": "Peter van Liesdonk",
         "email": "peter@liesdonk.nl"
@@ -53,7 +53,7 @@
     },
     {
       "name": "open-knowledge-format",
-      "description": "Author, validate, migrate and consume Open Knowledge Format bundles — Google Cloud's vendor-neutral spec for agent-readable knowledge as markdown with YAML frontmatter, with a conformance validator.",
+      "description": "Author, validate, migrate and consume Open Knowledge Format bundles \u2014 Google Cloud's vendor-neutral spec for agent-readable knowledge as markdown with YAML frontmatter, with a conformance validator.",
       "author": {
         "name": "Peter van Liesdonk",
         "email": "peter@liesdonk.nl"
@@ -64,7 +64,7 @@
     },
     {
       "name": "preflight-circus",
-      "description": "A blind six-lens review gate over BASE..HEAD, run before you push rather than after — the same examination a post-push review bot applies, sat while the diff is still local.",
+      "description": "A blind six-lens review gate over BASE..HEAD, run before you push rather than after \u2014 the same examination a post-push review bot applies, sat while the diff is still local.",
       "author": {
         "name": "Peter van Liesdonk",
         "email": "peter@liesdonk.nl"
@@ -83,6 +83,17 @@
       "source": "./plugins/refactor-audit",
       "category": "development",
       "homepage": "https://github.com/pvliesdonk/claude-plugins/tree/main/plugins/refactor-audit"
+    },
+    {
+      "name": "representing-information",
+      "description": "Decide what to show, how much, and in what form when presenting data, ontologies, processes or qualitative findings to a particular audience \u2014 the judgment behind a visualisation, not the rendering of one.",
+      "author": {
+        "name": "Peter van Liesdonk",
+        "email": "peter@liesdonk.nl"
+      },
+      "source": "./plugins/representing-information",
+      "category": "productivity",
+      "homepage": "https://github.com/pvliesdonk/claude-plugins/tree/main/plugins/representing-information"
     },
     {
       "name": "roadmapping",

@@ -69,6 +69,12 @@ Audit a Python codebase with complexity, churn, smell, and dead-code signals, th
 
 - **Source:** [`plugins/refactor-audit`](plugins/refactor-audit) — in this repository
 
+### representing-information
+
+Decide what to show, how much, and in what form when presenting data, ontologies, processes or qualitative findings to a particular audience — the judgment behind a visualisation, not the rendering of one.
+
+- **Source:** [`plugins/representing-information`](plugins/representing-information) — in this repository
+
 ### roadmapping
 
 Chart, refine and revisit multi-epic technical roadmaps at a declared resolution, holding the line against false precision about work nobody has scoped yet.
