@@ -96,7 +96,7 @@ Draft, structure, and revise nonfiction for real readers across proposals, paper
 
 ### paperless-mcp
 
-Paperless-NGX document management over MCP: search, tag, upload, and read documents; manage tags, correspondents, document types, and custom fields.
+Paperless-NGX over MCP: search, read, upload and tag documents; manage correspondents and types.
 
 - **Source:** [pvliesdonk/paperless-mcp](https://github.com/pvliesdonk/paperless-mcp)
 - **Homepage:** <https://pvliesdonk.github.io/paperless-mcp/>
