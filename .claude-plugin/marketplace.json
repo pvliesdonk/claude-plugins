@@ -137,9 +137,9 @@
         "source": "git-subdir",
         "url": "https://github.com/pvliesdonk/paperless-mcp.git",
         "path": ".claude-plugin/plugin",
-        "ref": "v2.1.0"
+        "ref": "v3.0.0"
       },
-      "version": "2.1.0"
+      "version": "3.0.0"
     }
   ]
 }
