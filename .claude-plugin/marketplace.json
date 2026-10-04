@@ -119,6 +119,17 @@
       "version": "2.0.0"
     },
     {
+      "name": "writing-agent-instructions",
+      "description": "Write, review and shorten the files an agent loads as instructions (AGENTS.md, CLAUDE.md, rules files, SKILL.md bodies) so that every sentence is one the agent can act on, and compress such a file by inventory rather than by asking a model to be concise, so that no rule is lost on the way.",
+      "author": {
+        "name": "Peter van Liesdonk",
+        "email": "peter@liesdonk.nl"
+      },
+      "source": "./plugins/writing-agent-instructions",
+      "category": "development",
+      "homepage": "https://github.com/pvliesdonk/claude-plugins/tree/main/plugins/writing-agent-instructions"
+    },
+    {
       "name": "writing-nonfiction",
       "description": "Draft, structure, and revise nonfiction for real readers across proposals, papers, white papers, blog posts, explainers, handbooks, and software documentation.",
       "author": {
