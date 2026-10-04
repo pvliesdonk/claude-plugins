@@ -88,6 +88,12 @@ FastMCP server for scholarly papers, patents, books and standards with docling P
 - **Source:** [pvliesdonk/scholar-mcp](https://github.com/pvliesdonk/scholar-mcp)
 - **Homepage:** <https://pvliesdonk.github.io/scholar-mcp/>
 
+### writing-agent-instructions
+
+Write, review and shorten the files an agent loads as instructions (AGENTS.md, CLAUDE.md, rules files, SKILL.md bodies) so that every sentence is one the agent can act on, and compress such a file by inventory rather than by asking a model to be concise, so that no rule is lost on the way.
+
+- **Source:** [`plugins/writing-agent-instructions`](plugins/writing-agent-instructions) — in this repository
+
 ### writing-nonfiction
 
 Draft, structure, and revise nonfiction for real readers across proposals, papers, white papers, blog posts, explainers, handbooks, and software documentation.
