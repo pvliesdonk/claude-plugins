@@ -11,7 +11,7 @@ lines, 23,522 characters against a 24,000-character budget).
 A fresh session was asked to make that file "more concise" with no other
 guidance. Observed, one run:
 
-    before  23,522 chars  164 sentences
+    before  23,522 chars  163 sentences
     after   20,007 chars  130 sentences   (-15 percent)
     code spans lost: 17, all abbreviations of a list that survived
     directives lost: none found by phrase check

@@ -116,10 +116,12 @@ explanation.
 ### 1. Inventory before prose
 
 ```bash
-python3 scripts/sentences.py AGENTS.md > /tmp/before.tsv
+# From the project root; the script reads only files under the working directory.
+python3 "${CLAUDE_PLUGIN_ROOT}"/skills/writing-agent-instructions/scripts/sentences.py AGENTS.md > /tmp/before.tsv
 ```
 
-Tag every sentence in the output with one letter:
+Outside a plugin install, the script is `scripts/sentences.py` beside this
+file. Tag every sentence in the output with one letter:
 
 | Tag | Meaning | Fate |
 |-----|---------|------|
@@ -154,7 +156,7 @@ empty.
 ### 3. Prove nothing was lost
 
 ```bash
-python3 scripts/sentences.py AGENTS.md.new > /tmp/after.tsv
+python3 "${CLAUDE_PLUGIN_ROOT}"/skills/writing-agent-instructions/scripts/sentences.py AGENTS.md.new > /tmp/after.tsv
 ```
 
 For every line of `inventory.md`, name the sentence in `after.tsv` that
@@ -230,6 +232,7 @@ Read the file as the agent that will act on it.
 ## Evidence
 
 The claims this skill rests on, with their sources, are in `evidence.md`
-beside it; the full dated reference with every quotation is
-`docs/design/reference/agent-instruction-files.md` in
-`pvliesdonk/fastmcp-server-template`. Read it before arguing with a rule here.
+beside it; it stands on its own. The dated reference it condenses, with
+every quotation, is `docs/design/reference/agent-instruction-files.md` in
+`pvliesdonk/fastmcp-server-template`. Read one of them before arguing with a
+rule here.
