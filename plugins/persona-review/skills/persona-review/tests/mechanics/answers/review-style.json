@@ -1,0 +1,11 @@
+{
+  "verdict": "Plain enough.",
+  "walk": {"path": [], "stop_point": "", "stop_reason": "", "goal_reached": "n/a"},
+  "came_for": [],
+  "teach_back": "",
+  "strengths": [],
+  "findings": [
+    {"location": "doc.md#Install", "quote": "Run `pip install widget-sync`, then run `widget-sync init` in the folder you want to sync.", "kind": "style", "severity": "minor", "blocks_goal": false, "basis": "rubric", "beyond_stop": false, "issue": "Two steps in one sentence.", "expected": "A numbered list."}
+  ],
+  "top_priorities": []
+}

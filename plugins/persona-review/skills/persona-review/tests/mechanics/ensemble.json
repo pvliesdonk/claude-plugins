@@ -1,0 +1,36 @@
+{
+  "title": "Widget Sync documentation",
+  "date": "2026-10-05",
+  "pin": "fixture",
+  "back_cover": "The documentation of Widget Sync, a tool that copies notes between devices.",
+  "seat": "Reading it on the project's website in October 2026.",
+  "reader_files": ["doc.md"],
+  "withheld": ["design.md"],
+  "ground_truth": ["design.md"],
+  "design_context": "Install first, configure second; one page only.",
+  "intended_takeaways": ["Install with pip and run init in the synced folder", "SYNC_DIR must be set outside the container"],
+  "done_when": ["No primary reader ends the walk misled"],
+  "personas": [
+    {
+      "key": "newcomer", "label": "Newcomer with a laptop", "tier": "primary",
+      "brief": "Has never run a sync tool; reads every word of the install steps.",
+      "goal": "Sync one folder between two laptops tonight.",
+      "entry": "doc.md", "stop_when": "Notes appear on the second laptop, or they give up.",
+      "budget_words": 30, "coverage": "path",
+      "came_for": ["The install command", "Which setting picks the folder"],
+      "source": "author"
+    },
+    {
+      "key": "evaluator", "label": "Evaluator", "tier": "gatekeeper",
+      "brief": "Five minutes to decide whether this replaces their current tool.",
+      "goal": "Decide go or no-go.",
+      "entry": "doc.md", "stop_when": "A decision.",
+      "budget_words": 200, "coverage": "whole",
+      "came_for": ["What it does", "Which platforms"],
+      "source": "inferred"
+    }
+  ],
+  "lenses": [
+    { "key": "style", "label": "Plain-language editor", "brief": "Apply the rubric.", "rubrics": ["rubric.md"] }
+  ]
+}

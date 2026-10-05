@@ -1,0 +1,22 @@
+{
+  "verdict": "I could install it, but I would have synced the wrong folder.",
+  "walk": {
+    "path": [
+      {"location": "doc.md#Install", "state": "oriented", "note": "clear"},
+      {"location": "doc.md#Configure", "state": "unsure", "note": "/data?"}
+    ],
+    "stop_point": "doc.md#Configure", "stop_reason": "Not sure what to set on a laptop.", "goal_reached": "partly"
+  },
+  "came_for": [
+    {"expectation": "The install command", "met": "yes", "where": "doc.md#Install"},
+    {"expectation": "Which setting picks the folder", "met": "partly", "where": "doc.md#Configure"}
+  ],
+  "teach_back": "Install with pip, run init (doc.md#Install); leave SYNC_DIR at /data (doc.md#Configure).",
+  "strengths": ["doc.md#Install: one command, then one more."],
+  "findings": [
+    {"location": "doc.md#Configure", "quote": "The default is /data, which is the path inside the container.", "kind": "absent", "severity": "major", "blocks_goal": true, "basis": "reaction", "beyond_stop": false, "issue": "Nothing says what to set on a laptop.", "expected": "One sentence: outside a container, set SYNC_DIR to your folder."},
+    {"location": "doc.md#Security", "quote": "All traffic is encrypted with TLS 1.3.", "kind": "wrong", "severity": "major", "blocks_goal": false, "basis": "recall", "beyond_stop": true, "issue": "I recall it uses TLS 1.2.", "expected": "The right version."},
+    {"location": "doc.md#Install", "quote": "Installation takes five minutes.", "kind": "annoyed", "severity": "minor", "blocks_goal": false, "basis": "reaction", "beyond_stop": false, "issue": "Time claim.", "expected": "No claim."}
+  ],
+  "top_priorities": ["Say what SYNC_DIR should be on a laptop."]
+}

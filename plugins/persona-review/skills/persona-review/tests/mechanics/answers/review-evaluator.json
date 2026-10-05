@@ -1,0 +1,17 @@
+{
+  "verdict": "Enough to say go for a trial.",
+  "walk": {
+    "path": [{"location": "doc.md", "state": "oriented", "note": ""}],
+    "stop_point": "read to the end", "stop_reason": "Short page.", "goal_reached": "yes"
+  },
+  "came_for": [
+    {"expectation": "What it does", "met": "yes", "where": "doc.md"},
+    {"expectation": "Which platforms", "met": "yes", "where": "doc.md"}
+  ],
+  "teach_back": "It copies notes between devices on Linux and macOS (doc.md). Go for a trial.",
+  "strengths": ["doc.md: the first line says what it is."],
+  "findings": [
+    {"location": "doc.md", "quote": "copies your notes between all devices", "kind": "unclear", "severity": "minor", "blocks_goal": false, "basis": "reaction", "beyond_stop": false, "issue": "Which devices?", "expected": "A list."}
+  ],
+  "top_priorities": ["List supported devices."]
+}

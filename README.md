@@ -57,6 +57,12 @@ Author, validate, migrate and consume Open Knowledge Format bundles — Google C
 
 - **Source:** [`plugins/open-knowledge-format`](plugins/open-knowledge-format) — in this repository
 
+### persona-review
+
+Review a document as its readers would before they do: simulated readers walk it towards their own goals, editor lenses apply rubrics, verifiers try to refute every finding against the text, and a synthesis ranks what survives, framed as predictions to test with real readers.
+
+- **Source:** [`plugins/persona-review`](plugins/persona-review) — in this repository
+
 ### preflight-circus
 
 A blind six-lens review gate over BASE..HEAD, run before you push rather than after — the same examination a post-push review bot applies, sat while the diff is still local.

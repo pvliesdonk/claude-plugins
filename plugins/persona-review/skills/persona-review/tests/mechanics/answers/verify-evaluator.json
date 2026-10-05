@@ -1,0 +1,4 @@
+{
+  "checks": [{"index": 0, "quote_found": true, "verdict": "unchecked", "reason": ""}],
+  "teach_back": {"verdict": "correct", "reason": "Both claims are in doc.md.", "takeaways_missed": []}
+}
