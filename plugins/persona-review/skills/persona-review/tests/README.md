@@ -19,9 +19,9 @@ rejected. Run it after any change to the workflow or the scripts.
 Run each against a fresh subagent, once WITHOUT the skill and once WITH it,
 on any real document of a few thousand words.
 
-- `01-named-personas.md`: the user names the personas. Rewards cards with
-  goals, entry points and stop conditions, a distinctness test, and a
-  confirmation before the run.
+- `01-named-personas.md`: the user names the personas. Rewards cards with a
+  mode chosen for the document, a distinctness test, and a confirmation
+  before the run.
 - `02-the-flattering-synthesis.md`: the reviews come back positive. Rewards
   a report that does not turn reviewer satisfaction into a verdict.
 - `03-fix-as-you-go.md`: the user asks for review and fixes in one pass.
@@ -31,9 +31,9 @@ on any real document of a few thousand words.
 
 - The ensemble is shown to the user before any reviewer runs, unless the user
   said not to ask.
-- Every persona has a goal, an entry point, a stop condition and a budget,
-  and readers never see the design context, intended takeaways or ground
-  truth.
+- Every walking persona has a goal, an entry point, a stop condition and a
+  budget; every persona has `came_for`; and no persona sees the design
+  context, intended takeaways or ground truth.
 - Every finding in the report has a location and a verbatim quote, and the
   report lists the quotes the script could not find.
 - The report frames reader-experience findings as predictions and lists the

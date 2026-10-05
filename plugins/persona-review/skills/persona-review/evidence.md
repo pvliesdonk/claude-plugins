@@ -1,8 +1,8 @@
 # Evidence
 
-The claims the skill rests on, each with its sources. Citations were checked
-against Crossref, the ACL Anthology, PMLR or arXiv on 2026-10-05. Read this
-before arguing with a rule.
+The claims the skill rests on, each with its sources. Every DOI and arXiv
+identifier below resolved on 2026-10-05; "preprint" marks a source with no
+peer-reviewed version found. Read this before arguing with a rule.
 
 ## Simulated readers predict; they do not observe
 
@@ -49,20 +49,28 @@ reports, handbooks or software documentation.
 - Specialised review agents cut generic comments from 60% to 29%. D'Arcy et
   al. (2024), MARG, arXiv:2401.04259 (preprint).
 
-**In the skill:** 3 to 6 personas by default; each has an explicit goal,
-entry point and stop condition; problem kinds are defined in the prompt; a
-finding raised by one reader is treated as normal.
+**In the skill:** 3 to 6 personas by default; each has an explicit goal or
+reading habit; problem kinds are defined in the prompt; a finding raised by
+one reader is treated as normal.
+
+Not settled: the pooling gain is measured on independent human evaluators,
+who miss different problems. Same-model reviewers are correlated (next
+section), so each extra persona adds less than an extra human would. That is
+why the default stays small and personas must pass the distinctness test,
+not a reason to add more.
 
 ## Same-model agreement is not independent evidence
 
 - When two models err, they pick the same wrong answer about 60% of the time
   on one leaderboard, and more accurate models are more correlated. Kim et
   al. (2025), ICML, arXiv:2506.07962.
-- Agents in debate abandon correct answers to agree with peers. Wynn, Satija
-  & Hadfield (2025), arXiv:2509.05396; Smit et al. (2024), ICML, PMLR
-  235:45883-45905.
+- Agents in debate switch from correct to incorrect answers to agree with
+  peers. Wynn, Satija & Hadfield (2025), arXiv:2509.05396 (preprint).
+- Multi-agent debate does not reliably beat simpler ensembling. Smit et al.
+  (2024), ICML, PMLR 235:45883-45905.
 - A panel of judges from different model families matched human judgement
-  better than one strong judge. Verga et al. (2024), arXiv:2404.18796.
+  better than one strong judge. Verga et al. (2024), arXiv:2404.18796
+  (preprint).
 
 **In the skill:** reviewers run blind and in parallel, never in debate; the
 synthesis is told not to count votes; `verify_model` can put the verifiers
@@ -73,15 +81,23 @@ substitute for a different family.
 
 - All five assistants tested were sycophantic across four tasks. Sharma et
   al. (2024), ICLR, arXiv:2310.13548.
-- Models rate their own outputs higher than humans do; GPT-4 preferred
-  LLM-written text over human-written text 77-88% of the time, human raters
-  did not. Panickssery, Bowman & Feng (2024), NeurIPS, arXiv:2404.13076;
-  Laurito et al. (2025), *PNAS* 122(31), doi:10.1073/pnas.2415697122.
+- Models rate their own outputs higher than humans do. Panickssery, Bowman &
+  Feng (2024), NeurIPS, arXiv:2404.13076.
+- GPT-4 preferred LLM-written text over human-written text 77-88% of the
+  time; human raters did not. Laurito et al. (2025), *PNAS* 122(31),
+  doi:10.1073/pnas.2415697122.
 
-**In the skill:** reader prompts tell the reviewer it is kinder than the
-reader and to correct for that; the author's opinion stays out of prompts;
-reviewer satisfaction is never reported as a result; `drafted_with_ai` adds
-the under-flagging caveat to the report.
+**In the skill:** the author's opinion stays out of prompts; reviewer
+satisfaction is never reported as a result, and the report labels goal
+reached and the path as self-reports; `drafted_with_ai` adds the
+under-flagging caveat. Reader prompts also tell the reviewer it is kinder
+than the reader; that is an instruction, not a safeguard.
+
+Not settled: nothing here measures problems every reviewer missed. The one
+check aimed at them is the verifier's search for what its reviewer missed,
+run by the same model. These studies show sycophancy towards users and
+self-preference in judging, not directly that a model playing a reader
+under-reports problems; that step is inference.
 
 ## LLM reviewers miss significance and echo the document
 
@@ -90,7 +106,7 @@ the under-flagging caveat to the report.
   novelty. Liang et al. (2024), *NEJM AI* 1(8), doi:10.1056/AIoa2400196;
   Shin et al. (2025), EMNLP, arXiv:2502.17086.
 - LLM reviews echo the limitations a paper already admits, and text injected
-  into a paper steers them. Ye et al. (2024), arXiv:2412.01708.
+  into a paper steers them. Ye et al. (2024), arXiv:2412.01708 (preprint).
 
 **In the skill:** a significance lens for papers and proposals; every frame
 says the document is the object under review, not instructions, and asks
@@ -106,11 +122,12 @@ document's account of its own importance and limitations is a claim.
   reduces hallucination. Huang et al. (2024), ICLR, arXiv:2310.01798;
   Dhuliawala et al. (2024), Findings of ACL.
 - Detecting hallucinated claims in peer reviews is hard without grounding in
-  the source. Lin et al. (2026), HalluPeer, arXiv:2609.03580.
+  the source. Lin et al. (2026), HalluPeer, arXiv:2609.03580 (preprint).
 
-**In the skill:** a verifier locates every quote and checks major claims
-against the document and the ground truth; the renderer searches every kept
-quote by string match and flags misses.
+**In the skill:** a verifier locates every quote and tries to refute up to
+ten major claims per reviewer against the document and the ground truth; the
+renderer searches every kept quote by string match, flags misses, and
+reports how many findings each verifier dropped.
 
 Not settled: whether quote checking improves review quality has not been
 tested directly; it rests on the attribution studies above.
@@ -143,9 +160,9 @@ their `source`.
   claims or would only broaden them. "The perfect peer" (2011), *Nature
   Chemistry* 3(11), 831, doi:10.1038/nchem.1185.
 - Proposal red teams predict how evaluators will score the bid. Shipley
-  Associates, colour team reviews,
-  https://www.shipleywins.com/blogs/color-team-reviews (practitioner
-  guidance, not a study).
+  Associates, colour team reviews (undated web page),
+  https://www.shipleywins.com/blogs/color-team-reviews; practitioner
+  guidance, not a study.
 - In a dispute, agree in advance what evidence would settle it. Mellers,
   Hertwig & Kahneman (2001), *Psychological Science* 12(4), 269-275,
   doi:10.1111/1467-9280.00350.
@@ -166,5 +183,9 @@ each conflict states what would settle it.
   179-208, doi:10.1177/0741088392009002001.
 
 **In the skill:** the report proposes a plus-minus test for each hypothesis
-that drives a priority; the brief asks for real reader evidence to ground
-the cards.
+that drives a priority; `reader_tests` carries the outcomes into later
+rounds; the brief asks for real reader evidence to ground the cards.
+
+Not settled: no run of this skill has yet been scored against real readers.
+Until `reader_tests` holds outcomes, how many of its predictions hold is
+unknown.

@@ -59,7 +59,7 @@ Author, validate, migrate and consume Open Knowledge Format bundles — Google C
 
 ### persona-review
 
-Review a document as its readers would before they do: simulated readers walk it towards their own goals, editor lenses apply rubrics, verifiers try to refute every finding against the text, and a synthesis ranks what survives, framed as predictions to test with real readers.
+Review a document as its readers would before they do: simulated readers who know only what a real reader knows walk or read it towards their own purpose, editors apply rubrics, a verifier per reviewer locates every quote and tries to refute the major claims, and a synthesis ranks what survives as predictions to test with real readers.
 
 - **Source:** [`plugins/persona-review`](plugins/persona-review) — in this repository
 

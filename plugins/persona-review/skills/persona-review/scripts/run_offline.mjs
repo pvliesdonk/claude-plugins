@@ -101,6 +101,18 @@ Then reply with that path and nothing more.
 `
 }
 
+// An answer wrapped in a markdown code fence is accepted; the fence is cut
+// off by position rather than by a backtracking pattern.
+function stripFence(raw) {
+  let t = raw.trim()
+  if (t.startsWith('```')) {
+    const firstNewline = t.indexOf('\n')
+    t = firstNewline === -1 ? '' : t.slice(firstNewline + 1)
+    if (t.trimEnd().endsWith('```')) t = t.trimEnd().slice(0, -3)
+  }
+  return t
+}
+
 async function agent(prompt, opts = {}) {
   const label = opts.label || `agent-${pending.length}`
   const name = stem(label)
@@ -109,7 +121,7 @@ async function agent(prompt, opts = {}) {
     const raw = readFileSync(answerPath, 'utf8')
     let value
     try {
-      value = opts.schema ? JSON.parse(raw.replace(/^\s*```(?:json)?\s*|\s*```\s*$/g, '')) : raw
+      value = opts.schema ? JSON.parse(stripFence(raw)) : raw
     } catch (e) {
       invalid.push(`${name}.json: not valid JSON (${e.message})`)
       return null
@@ -133,7 +145,9 @@ async function pipeline(items, ...stages) {
       try {
         acc = await stages[s](s === 0 ? item : acc, item, index)
       } catch (e) {
-        if (e instanceof PendingBeforeSynthesis) throw e
+        if (e instanceof PendingBeforeSynthesis) {
+          throw e
+        }
         return null
       }
     }
@@ -142,7 +156,16 @@ async function pipeline(items, ...stages) {
 }
 
 async function parallel(thunks) {
-  return Promise.all(thunks.map(async t => { try { return await t() } catch (e) { if (e instanceof PendingBeforeSynthesis) throw e; return null } }))
+  return Promise.all(thunks.map(async t => {
+    try {
+      return await t()
+    } catch (e) {
+      if (e instanceof PendingBeforeSynthesis) {
+        throw e
+      }
+      return null
+    }
+  }))
 }
 
 const logs = []

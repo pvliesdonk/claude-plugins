@@ -24,7 +24,8 @@ The checks are deterministic and run on every render:
   a surviving quote means surviving text, not necessarily a surviving
   problem.
 
-Files are read only from under --root (default: the current directory).
+Every path argument must resolve to somewhere under the working directory,
+and files are read only from under --root (default: the working directory).
 """
 
 from __future__ import annotations
@@ -43,8 +44,17 @@ TIER_ORDER = {"primary": 0, "gatekeeper": 1, "secondary": 2, "adversarial": 3, N
 
 # ------------------------------------------------------------- loading ----
 
-def load_json(path: str):
-    with open(path, encoding="utf-8") as fh:
+def under_cwd(name: str) -> Path:
+    """Resolve a path argument, refusing one outside the working directory."""
+    root = Path.cwd().resolve()
+    path = (root / name).resolve()
+    if path != root and root not in path.parents:
+        raise SystemExit(f"error: {name!r} is outside the working directory {root}")
+    return path
+
+
+def load_json(path: Path):
+    with path.open(encoding="utf-8") as fh:
         data = json.load(fh)
     if isinstance(data, dict) and "reviews" not in data and "result" in data:
         data = data["result"]
@@ -109,8 +119,8 @@ def section(text: str, heading: str) -> str | None:
     want = normalise(heading)
     lines = text.splitlines()
     for i, line in enumerate(lines):
-        m = re.match(r"^(#{1,6})\s+(.*?)\s*#*\s*$", line)
-        if m and normalise(m.group(2)) == want:
+        m = re.match(r"^(#{1,6})\s+(.*)$", line)
+        if m and normalise(m.group(2).rstrip().rstrip("#")) == want:
             level = len(m.group(1))
             out = []
             for nxt in lines[i + 1:]:
@@ -296,10 +306,14 @@ def build(ensemble: dict, result: dict, texts: dict[str, str], previous: dict | 
     personas = sorted([r for r in reviews if r.get("kind") == "persona"],
                       key=lambda r: TIER_ORDER.get(r.get("tier"), 4))
     if personas:
-        w("## The walks")
+        w("## The readers")
         w("")
-        w("| Reader | Tier | Goal reached | Teach-back | Words read / budget | Path | B / M / m |")
-        w("|---|---|---|---|---|---|---|")
+        w("Teach-back is the verifier's judgement of what the reader came away with. Goal reached, path "
+          "and stop point are the simulated reader's own account, and words read is computed from that "
+          "account: self-reports, not measurements.")
+        w("")
+        w("| Reader | Tier | Mode | Teach-back (verified) | Goal reached (self-report) | Words read / budget | Path | B / M / m |")
+        w("|---|---|---|---|---|---|---|---|")
         for r in personas:
             walk = r.get("walk") or {}
             total, uncounted = path_words(walk.get("path"), texts)
@@ -311,8 +325,8 @@ def build(ensemble: dict, result: dict, texts: dict[str, str], previous: dict | 
             words_cell = f"{total:,}{'+' if uncounted else ''} / {budget:,}{over}" if budget else f"{total:,}{'+' if uncounted else ''}"
             states = " → ".join(s.get("state", "?") for s in walk.get("path") or [])
             tb = (r.get("teach_back_check") or {}).get("verdict", "n/a")
-            w(f"| {cell(labels[r['key']])} | {r.get('tier') or ''} | {walk.get('goal_reached', '')} | {tb} | "
-              f"{words_cell} | {cell(states)} | {tally(r.get('findings', []))} |")
+            w(f"| {cell(labels[r['key']])} | {r.get('tier') or ''} | {r.get('mode') or 'walk'} | {tb} | "
+              f"{walk.get('goal_reached', '')} | {words_cell} | {cell(states)} | {tally(r.get('findings', []))} |")
         w("")
         w("A `+` after the word count means some locations on the path could not be counted "
           "(listed per reader below).")
@@ -331,6 +345,19 @@ def build(ensemble: dict, result: dict, texts: dict[str, str], previous: dict | 
             if t.get("locations"):
                 w(f"Where: {'; '.join(t['locations'])}.")
                 w("")
+
+    tests = ensemble.get("reader_tests") or []
+    if tests:
+        outcomes: dict[str, int] = {}
+        for t in tests:
+            outcomes[t.get("outcome", "untested")] = outcomes.get(t.get("outcome", "untested"), 0) + 1
+        w("## Predictions tested on real readers so far")
+        w("")
+        w(", ".join(f"{n} {k}" for k, n in sorted(outcomes.items())) + ".")
+        w("")
+        for t in tests:
+            w(f"- {t.get('hypothesis')}: **{t.get('outcome')}**{(' (' + t['note'] + ')') if t.get('note') else ''}")
+        w("")
 
     if syn.get("validate_with_readers"):
         w("## Check with real readers")
@@ -394,13 +421,14 @@ def build(ensemble: dict, result: dict, texts: dict[str, str], previous: dict | 
             for f in sorted(r["findings"], key=lambda x: SEV_ORDER.get(x.get("severity"), 3)):
                 raised = f" (reported {f['severity_as_reported']}; raised by the tier rule)" if f.get("severity_as_reported") else ""
                 beyond = ", past the stop point" if f.get("beyond_stop") else ""
-                w(f"- **[{f.get('severity')} / {f.get('kind')}]**{raised} {f.get('location')}{beyond}")
+                by_verifier = " (found by the verifier, not the reviewer)" if f.get("found_by") == "verifier" else ""
+                w(f"- **[{f.get('severity')} / {f.get('kind')}]**{raised}{by_verifier} {f.get('location')}{beyond}")
                 flag = "" if f.get("_quote_ok") is not False else " **(quote not found by the script; check before acting)**"
                 w(f"  - Quote: \"{f.get('quote')}\"{flag}")
                 w(f"  - Issue: {f.get('issue')}")
                 w(f"  - Needed: {f.get('expected')}")
                 v = f.get("verification") or {}
-                if v.get("verdict") not in (None, "unchecked"):
+                if v.get("verdict") not in (None, "unchecked", "verifier-found"):
                     line = f"  - Verified: {v['verdict']}. {v.get('reason', '')}"
                     if v.get("adjusted"):
                         line += f" Adjusted: {v['adjusted']}"
@@ -432,15 +460,27 @@ def build(ensemble: dict, result: dict, texts: dict[str, str], previous: dict | 
     blind = method.get("blind")
     w(f"- Runner: {runner}; reviewers {'blind to one another' if blind else 'NOT blind: one context wrote every review, so later reviews saw earlier ones'}. "
       f"Model: {method.get('model', '?')}; verifier model: {method.get('verify_model', method.get('model', '?'))}.")
-    kept = sum(len(r.get("findings", [])) for r in reviews)
-    w(f"- {kept} findings kept, {len(dropped)} dropped by verifiers. "
-      f"Refutation capped at {method.get('max_verify_per_reviewer', '?')} major findings per reviewer.")
+    raised_n = sum(len([f for f in r.get("findings", []) if f.get("found_by") != "verifier"]) for r in reviews) + len(dropped)
+    added_n = sum(len([f for f in r.get("findings", []) if f.get("found_by") == "verifier"]) for r in reviews)
+    checked_n = sum(len([f for f in r.get("findings", []) if (f.get("verification") or {}).get("verdict") in ("confirmed", "adjusted")]) for r in reviews) + \
+        len([f for f in dropped if (f.get("verification") or {}).get("verdict") == "refuted"])
+    w(f"- Verification: a verifier located every quote and tried to refute up to "
+      f"{method.get('max_verify_per_reviewer', '?')} major claims per reviewer; the rest are unverified. "
+      f"Reviewers raised {raised_n} findings; {checked_n} were put to refutation, and {len(dropped)} were dropped "
+      f"(refuted or quote not found). Verifiers added {added_n} the reviewers missed.")
+    per = [f"{labels.get(r['key'], r['key'])} {r.get('refuted', 0)} of "
+           f"{len([f for f in r.get('findings', []) if f.get('found_by') != 'verifier']) + r.get('refuted', 0)}"
+           for r in reviews]
+    w(f"- Dropped per reviewer: {'; '.join(per)}. A verifier is the same model as the reviewer and can drop "
+      "true findings too; read *Dropped findings*.")
     if texts:
         w(f"- Quote check: {stats['quotes_checked']} quotes searched in {len(texts)} file(s); "
           f"{len(stats['quotes_missing'])} not found"
           + (": " + "; ".join(f"{labels.get(k, k)} at {loc}" for k, loc in stats["quotes_missing"]) if stats["quotes_missing"] else "") + ".")
     else:
         w("- Quote check: not run; no reader files were found under the root.")
+    w("- No check here measures what every reviewer missed. The verifiers' own search for missed problems "
+      "is the only one, and it is the same model again.")
     w("- Simulated readers predict reader problems; they do not observe them. Human experts asked to predict "
       "what real readers will struggle with catch a minority of it and add problems readers never have, so "
       "treat reader-experience findings as hypotheses and test the ones that matter.")
@@ -469,9 +509,10 @@ def main() -> int:
     ap.add_argument("--root", default=".", help="directory the ensemble's paths are relative to")
     a = ap.parse_args()
 
-    root = Path(a.root)
-    ensemble = load_json(a.ensemble)
-    result = load_json(a.result)
+    root = under_cwd(a.root)
+    ensemble = load_json(under_cwd(a.ensemble))
+    result_path = under_cwd(a.result)
+    result = load_json(result_path)
     if result.get("status") == "error" and not result.get("reviews"):
         print(f"error: the run failed at stage {result.get('stage')}: {result.get('problems')}", file=sys.stderr)
         return 1
@@ -479,10 +520,10 @@ def main() -> int:
     for p in ensemble.get("personas") or []:
         patterns += p.get("reader_files") or []
     texts = resolve_files(patterns, root)
-    previous = load_json(a.previous) if a.previous else None
+    previous = load_json(under_cwd(a.previous)) if a.previous else None
     report, stats = build(ensemble, result, texts, previous, None)
-    out = a.output or os.path.join(os.path.dirname(os.path.abspath(a.result)), "report.md")
-    Path(out).write_text(report, encoding="utf-8")
+    out = under_cwd(a.output) if a.output else result_path.parent / "report.md"
+    out.write_text(report, encoding="utf-8")
     print(f"wrote {out}: {stats['quotes_checked']} quotes checked, {len(stats['quotes_missing'])} not found")
     return 0
 

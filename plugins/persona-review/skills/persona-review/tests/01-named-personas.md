@@ -23,16 +23,18 @@ Failure modes:
 
 ## Expected output (with the skill)
 
-Cards for the three named readers, each with a goal ("decide whether the
-payback claim survives a budget meeting"), an entry point, a budget and
-what they came for. The distinctness test applied: if the CFO and COO would
+Cards for the three named readers, each with what they came for and a mode
+chosen for a white paper (read, since the question is whether it persuades;
+a walk where a reader has a concrete task, such as "decide whether the
+payback claim survives a budget meeting"). The distinctness test applied: if the CFO and COO would
 raise the same findings, they are merged or one is sharpened. A proposal to
 add an adversarial reader and, if the paper has one, the gatekeeper,
 marked `assumed`. "Go" counts as permission to run without confirmation,
 so the table is shown and the run starts.
 
 Pass criteria:
-- Every card has goal, entry, stop_when, budget_words and came_for.
+- Every card has came_for and a mode; every walking card also has goal,
+  entry, stop_when and budget_words.
 - The distinctness test is visible in the confirmation table or the
   message.
 - Any persona the user did not name is marked as added, with its source.

@@ -1,8 +1,39 @@
 {
   "checks": [
-    {"index": 0, "quote_found": true, "verdict": "confirmed", "reason": "doc.md Configure never gives a laptop value."},
-    {"index": 1, "quote_found": true, "verdict": "refuted", "reason": "design.md says TLS 1.3."},
-    {"index": 2, "quote_found": false, "verdict": "unchecked", "reason": "Quote not in doc.md."}
+    {
+      "index": 0,
+      "quote_found": true,
+      "verdict": "confirmed",
+      "reason": "doc.md Configure never gives a laptop value."
+    },
+    {
+      "index": 1,
+      "quote_found": true,
+      "verdict": "refuted",
+      "reason": "design.md says TLS 1.3."
+    },
+    {
+      "index": 2,
+      "quote_found": false,
+      "verdict": "unchecked",
+      "reason": "Quote not in doc.md."
+    }
   ],
-  "teach_back": {"verdict": "wrong", "reason": "Leaving SYNC_DIR at /data on a laptop syncs nothing.", "takeaways_missed": ["SYNC_DIR must be set outside the container"]}
+  "teach_back": {
+    "verdict": "wrong",
+    "reason": "Leaving SYNC_DIR at /data on a laptop syncs nothing.",
+    "takeaways_missed": [
+      "SYNC_DIR must be set outside the container"
+    ]
+  },
+  "missed": [
+    {
+      "location": "doc.md#Install",
+      "quote": "Run `pip install widget-sync`, then run `widget-sync init` in the folder you want to sync.",
+      "kind": "absent",
+      "severity": "major",
+      "issue": "No Python version stated.",
+      "expected": "Which Python it needs."
+    }
+  ]
 }

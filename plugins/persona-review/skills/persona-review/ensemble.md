@@ -1,7 +1,23 @@
 # The ensemble file
 
-`ensemble.json` is the whole input to a review. The workflow validates it
-before dispatching anything and returns every problem at once.
+`ensemble.json` is the whole input to a review. The workflow rejects a
+malformed one before dispatching anything, listing every problem.
+
+## Walk or read
+
+Choose per persona; one ensemble may mix both.
+
+| | walk | read |
+|---|---|---|
+| Fits | a document consulted to get something done: a docs site, a procedure, a reference, an evaluator scoring against criteria | a document read through, where the question is trust, persuasion or reception: a paper, a white paper, a handbook's argument |
+| Needs | `goal`, `entry`, `stop_when`, `budget_words` | `came_for`; `goal` and `entry` optional |
+| Teach-back | always, judged by the verifier | only with `teach_back: true` |
+| Tier rule | a misled, wrong, absent or gave-up finding that blocks the goal is raised to blocker in code | off: severity is the persona's |
+| Default coverage | `path`: findings cover the walk | `whole`: read on past the stop point |
+| Gives you | goal reached, words read against budget, a verified teach-back: comparable between rounds | where each reader would stop, and why |
+| Costs | setup per persona; misses what lies off the path | no measure to compare rounds by |
+
+A persona with a `goal` and no `mode` walks; one without a goal reads.
 
 ## Document fields
 
@@ -13,14 +29,16 @@ before dispatching anything and returns every problem at once.
 | `back_cover` | yes | all | What a reader knows before opening it: one to three sentences, as a cover, a listing or a link preview would say it. |
 | `seat` | no | all | When and where it is read ("on publication in November 2026", "from a search result"). Dates are judged from here. |
 | `reader_files` | yes | all | Paths or globs, relative to the project root, of what a reader gets. |
-| `withheld` | no | readers, as a do-not-open list | Authors' internals: notes, conventions, drafts. |
+| `withheld` | no | readers, as a do-not-open list | Authors' internals: notes, conventions, fact registers, drafts. |
 | `format_notes` | no | readers, editors | How to read source artefacts: "YAML frontmatter and `[@key]` markers are source format; read past them". |
 | `design_context` | no | verifiers, synthesis | Deliberate design decisions, so friction with them is reported as a collision, not dismissed. |
 | `intended_takeaways` | no | verifiers, synthesis | What a reader must leave with. Each teach-back is checked against these. |
 | `ground_truth` | no | verifiers | What the document describes or relies on: source code, a fact register, cited sources. Beats a reviewer's recall. |
 | `done_when` | no | synthesis | Acceptance criteria the synthesis measures clause by clause. |
 | `drafted_with_ai` | no | report | `true` adds the caveat that same-family reviewers under-flag model-written text. |
-| `previous` | no | synthesis | `{ "date", "pin", "priorities": [titles] }` from the last round. |
+| `previous` | no | synthesis | `{ "date", "pin", "priorities": [titles], "rewritten": [sections changed since] }` from the last round. |
+| `reader_tests` | no | synthesis, report | `[{ "hypothesis", "outcome": "confirmed" \| "refuted" \| "untested", "note" }]`: real-reader tests of earlier predictions, carried from round to round. |
+| `tier_rule` | no | runner | `false` turns the tier rule off for walks too. |
 | `model`, `verify_model` | no | runner | A model tier for every agent, or for the verifiers only. Omit both to inherit the session's. |
 | `max_verify_per_reviewer` | no | runner | Default 10. Findings over the cap stay, marked unverified, and the run log says how many. |
 
@@ -30,24 +48,26 @@ before dispatching anything and returns every problem at once.
 |-------|----------|---------------|
 | `key` | yes | Lowercase, digits, hyphens; unique across personas and lenses. |
 | `label` | yes | The heading in the report. |
+| `mode` | no | `walk` or `read`; see *Walk or read*. |
 | `tier` | yes | `primary` (the document exists for them), `gatekeeper` (decides acceptance, funding, publication or purchase), `secondary` (also reads it), `adversarial` (reads for the weakest point). |
 | `brief` | yes | Who they are, in the second person: role, situation, prior knowledge, what they distrust, how they read. |
-| `goal` | yes | What they are trying to do or decide. |
-| `entry` | yes | Where they start: a file, a section, a search result, `llms.txt`. |
-| `stop_when` | yes | The condition that ends the walk, reachable by reading: "you can name the command you would run", "a go/no-go", "you would put it down". |
+| `goal` | walk | What they are trying to do or decide. |
+| `entry` | walk | Where they start: a file, a section, a search result, `llms.txt`. |
+| `stop_when` | walk | The condition that ends the walk, reachable by reading: "you can name the command you would run", "a go/no-go", "you would put it down". |
 | `came_for` | yes | Two to five expectations, written from their situation before anyone reads the document. For a gatekeeper scoring against a call or a rubric, list the criteria here. |
-| `budget_words` | no | Reading patience in words. |
-| `coverage` | no | `path` (default): findings cover the walk only. `whole`: after the walk, read the rest and mark findings past the stop point. |
+| `budget_words` | walk | Reading patience in words. Optional for a read. |
+| `teach_back` | no | `true` asks a reading persona for a teach-back too. |
+| `coverage` | no | `path`: findings cover what was read. `whole`: read on past the stop point and mark those findings. Defaults by mode. |
 | `weighting` | no | How this reader trades reading experience against correctness: "70% experience, 30% correctness". |
 | `reader_files` | no | Overrides the document's, for a reader who gets something else (an LLM client reading `llms.txt`). |
-| `source` | no | `author` (the author named this reader), `evidence` (real reader data), `inferred` or `assumed`. Shown in the confirmation table. |
+| `source` | no | `author`: the author named this reader. `evidence`: real reader data shows them (tickets, reviews, analytics). `inferred`: the document's purpose or channel implies them. `assumed`: none of these; you added them. Shown in the confirmation table. |
 
 ## Lens fields
 
 `key`, `label` and `brief` as above, and `rubrics`: the files the editor reads
-first. A lens without a rubric judges taste, so give it one: the project's
-style guide, a conventions file, an installed style skill's file, or the call
-text for a compliance lens.
+first. A lens without a rubric judges taste: give it the project's style
+guide, a conventions file or the call text, or write the author's house
+rules into its brief.
 
 ## Writing a card
 
@@ -57,18 +77,12 @@ text for a compliance lens.
 - Make the brief concrete enough to decide a case: "has never run an MCP
   server" beats "non-technical"; "signs the declaration that puts the product
   on the market" beats "senior".
-- Write `came_for` before reading the document closely. Expectations written
-  after reading drift towards what the document happens to deliver.
 - Budgets: about 200 words a minute for careful reading, 300 for skimming. A
   five-minute evaluator is 1,000 words. For an LLM client, convert its token
   budget at about 0.75 words a token.
-- Use `coverage: whole` for a document read cover to cover (a handbook, a
-  paper); `path` for one consulted (a docs site, a reference).
 - For an adversarial reader, require a fair restatement of the argument
   before any objection, and for each objection the evidence that would
   answer it.
-- Mark a card `assumed` when no one has told you this reader exists, and say
-  so in the confirmation table.
 
 ## Example
 
@@ -87,7 +101,7 @@ text for a compliance lens.
   "done_when": ["No primary reader ends the walk misled"],
   "personas": [
     {
-      "key": "evaluator", "label": "Evaluator", "tier": "gatekeeper",
+      "key": "evaluator", "label": "Evaluator", "tier": "gatekeeper", "mode": "walk",
       "brief": "You found this in a list of sync tools. You use Syncthing today and have five minutes.",
       "goal": "Decide whether to try it instead.",
       "entry": "README.md",
