@@ -77,7 +77,13 @@ length times the number of reviewers. Levers, all in `ensemble.json`: fewer
 personas, `coverage: path` so walkers stop at their budget, a cheaper
 `model` or `verify_model`, and a lower `max_verify_per_reviewer`.
 
-## What it will not claim
+## What it is for, and what it will not claim
+
+Use it before human reviewers see a draft, not instead of them. In the runs
+behind it, its value was the angles the writer had not thought of: the reader
+who arrives from a search result, the buyer who needs a purchase-order
+question, the agent that follows instructions literally. It does not replace
+real reviewers.
 
 Simulated readers predict reader problems; they do not observe them. Human
 experts asked to predict what real readers struggle with caught under 15% of

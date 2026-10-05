@@ -59,24 +59,44 @@ try {
 // ------------------------------------------------- schema check (light) ----
 // Enough to catch a malformed answer before it poisons a later stage:
 // required keys, primitive types and enums, recursively.
+function checkObject(value, schema, path, errors) {
+  if (!value || typeof value !== 'object' || Array.isArray(value)) {
+    errors.push(`${path}: expected object`)
+    return
+  }
+  for (const k of schema.required || []) {
+    if (!(k in value)) errors.push(`${path}.${k}: missing`)
+  }
+  for (const [k, sub] of Object.entries(schema.properties || {})) {
+    if (k in value) check(value[k], sub, `${path}.${k}`, errors)
+  }
+}
+
+function checkArray(value, schema, path, errors) {
+  if (!Array.isArray(value)) {
+    errors.push(`${path}: expected array`)
+    return
+  }
+  value.forEach((v, i) => check(v, schema.items, `${path}[${i}]`, errors))
+}
+
+function checkString(value, schema, path, errors) {
+  if (typeof value !== 'string') errors.push(`${path}: expected string`)
+  else if (schema.enum && !schema.enum.includes(value)) errors.push(`${path}: "${value}" not in ${schema.enum.join('|')}`)
+}
+
+const PRIMITIVE = {
+  integer: [Number.isInteger, 'integer'],
+  boolean: [(v) => typeof v === 'boolean', 'boolean'],
+}
+
 function check(value, schema, path, errors) {
   if (!schema) return
-  const t = schema.type
-  if (t === 'object') {
-    if (!value || typeof value !== 'object' || Array.isArray(value)) { errors.push(`${path}: expected object`); return }
-    for (const k of schema.required || []) if (!(k in value)) errors.push(`${path}.${k}: missing`)
-    for (const [k, sub] of Object.entries(schema.properties || {})) if (k in value) check(value[k], sub, `${path}.${k}`, errors)
-  } else if (t === 'array') {
-    if (!Array.isArray(value)) { errors.push(`${path}: expected array`); return }
-    value.forEach((v, i) => check(v, schema.items, `${path}[${i}]`, errors))
-  } else if (t === 'string') {
-    if (typeof value !== 'string') errors.push(`${path}: expected string`)
-    else if (schema.enum && !schema.enum.includes(value)) errors.push(`${path}: "${value}" not in ${schema.enum.join('|')}`)
-  } else if (t === 'integer') {
-    if (!Number.isInteger(value)) errors.push(`${path}: expected integer`)
-  } else if (t === 'boolean') {
-    if (typeof value !== 'boolean') errors.push(`${path}: expected boolean`)
-  }
+  if (schema.type === 'object') return checkObject(value, schema, path, errors)
+  if (schema.type === 'array') return checkArray(value, schema, path, errors)
+  if (schema.type === 'string') return checkString(value, schema, path, errors)
+  const primitive = PRIMITIVE[schema.type]
+  if (primitive && !primitive[0](value)) errors.push(`${path}: expected ${primitive[1]}`)
 }
 
 // ---------------------------------------------------------- the hooks ----

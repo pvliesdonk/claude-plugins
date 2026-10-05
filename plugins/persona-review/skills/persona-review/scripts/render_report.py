@@ -114,18 +114,26 @@ def words(text: str) -> int:
     return len(re.findall(r"\b\w[\w'-]*\b", text))
 
 
+def heading_of(line: str) -> tuple[int, str] | None:
+    """(level, title) for an ATX markdown heading line, else None."""
+    level = len(line) - len(line.lstrip("#"))
+    if not 1 <= level <= 6 or line[level:level + 1] not in (" ", "\t"):
+        return None
+    return level, line[level:].strip().rstrip("#").strip()
+
+
 def section(text: str, heading: str) -> str | None:
     """The text under a markdown heading, up to the next heading of the same or higher level."""
     want = normalise(heading)
     lines = text.splitlines()
     for i, line in enumerate(lines):
-        m = re.match(r"^(#{1,6})\s+(.*)$", line)
-        if m and normalise(m.group(2).rstrip().rstrip("#")) == want:
-            level = len(m.group(1))
+        parsed = heading_of(line)
+        if parsed and normalise(parsed[1]) == want:
+            level = parsed[0]
             out = []
             for nxt in lines[i + 1:]:
-                n = re.match(r"^(#{1,6})\s", nxt)
-                if n and len(n.group(1)) <= level:
+                n = heading_of(nxt)
+                if n and n[0] <= level:
                     break
                 out.append(nxt)
             return "\n".join(out)
@@ -160,6 +168,19 @@ def path_words(path: list[dict], texts: dict[str, str]) -> tuple[int, list[str]]
 
 # ----------------------------------------------------------- rendering ----
 
+TABLE3 = "|---|---|---|"
+RULE_CAVEATS = [
+    "- No check here measures what every reviewer missed. The verifiers' own search for missed problems "
+    "is the only one, and it is the same model again.",
+    "- Simulated readers predict reader problems; they do not observe them. Human experts asked to predict "
+    "what real readers will struggle with catch a minority of it and add problems readers never have, so "
+    "treat reader-experience findings as hypotheses and test the ones that matter.",
+    "- The reviewers are one model wearing different briefs. Their agreement is weaker evidence than "
+    "agreement between independent people, and their satisfaction is not evidence of quality: models "
+    "playing readers are kinder than readers, and favour text written by models.",
+]
+
+
 def label_map(result: dict) -> dict[str, str]:
     labels = {}
     for r in result.get("reviews", []):
@@ -185,319 +206,346 @@ def cell(text) -> str:
     return str(text if text is not None else "").replace("|", "\\|").replace("\n", " ")
 
 
-def build(ensemble: dict, result: dict, texts: dict[str, str], previous: dict | None,
-          prev_texts_note: str | None) -> tuple[str, dict]:
-    syn = result.get("synthesis") or {}
-    reviews = result.get("reviews", [])
-    labels = label_map(result)
-    corpus = normalise("\n".join(texts.values()))
-    stats = {"quotes_checked": 0, "quotes_missing": []}
+def plural(n: int, one: str, many: str) -> str:
+    return one if n == 1 else many
 
-    for r in reviews:
-        for f in r.get("findings", []):
-            stats["quotes_checked"] += 1
-            f["_quote_ok"] = quote_found(f.get("quote", ""), corpus) if texts else None
-            if f["_quote_ok"] is False:
-                stats["quotes_missing"].append((r["key"], f.get("location", "")))
 
-    out: list[str] = []
-    w = out.append
-    method = result.get("method", {})
+def verdict_of(check) -> str:
+    return (check or {}).get("verdict", "n/a")
 
-    w(f"# Persona review: {result.get('title') or ensemble.get('title')}")
-    w("")
-    pin = result.get("pin") or ensemble.get("pin")
-    n_readers = len([r for r in reviews if r.get("kind") == "persona"])
-    n_lenses = len([r for r in reviews if r.get("kind") == "lens"])
-    w(f"Reviewed {result.get('date', '')}{f' at {pin}' if pin else ''}. "
-      f"{n_readers} simulated reader{'s' if n_readers != 1 else ''} and "
-      f"{n_lenses} editor lens{'es' if n_lenses != 1 else ''}. "
-      "The readers are a model playing people, so every finding about how a reader reacts is a "
-      "prediction to test, not an observation; see *Method and caveats*.")
-    w("")
-    if result.get("status") != "ok":
-        w(f"**Run status: {result.get('status')}.** No review came back from: "
-          f"{names(method.get('failed'), labels) or 'none'}.")
-        w("")
 
-    w("## Summary")
-    w("")
-    w(syn.get("summary", "(no synthesis)"))
-    w("")
+class Ctx:
+    """Everything the section renderers share."""
 
-    if syn.get("priorities"):
-        w("## Priorities")
-        w("")
-        for i, p in enumerate(syn["priorities"], 1):
-            w(f"### {i}. {p['title']}")
-            w("")
-            w(p["rationale"])
-            w("")
-            w(f"Raised by: {names(p.get('raised_by'), labels)}. Where: {'; '.join(p.get('locations') or [])}.")
-            w("")
+    def __init__(self, ensemble, result, texts, previous):
+        self.ensemble = ensemble
+        self.result = result
+        self.syn = result.get("synthesis") or {}
+        self.reviews = result.get("reviews", [])
+        self.method = result.get("method", {})
+        self.dropped = result.get("dropped") or []
+        self.labels = label_map(result)
+        self.texts = texts
+        self.corpus = normalise("\n".join(texts.values()))
+        self.previous = previous
+        self.stats = {"quotes_checked": 0, "quotes_missing": []}
 
-    if syn.get("conflicts"):
-        w("## Decisions for the author")
-        w("")
-        w("Readers who want opposite things, or reader friction that collides with a design decision. "
-          "The reviews cannot settle these.")
-        w("")
-        for i, c in enumerate(syn["conflicts"], 1):
-            kind = "Readers disagree" if c.get("kind") == "readers-disagree" else "Design collision"
-            w(f"{i}. **{kind}.** {c['description']}")
-            w(f"   - Between: {names(c.get('between'), labels)}.")
-            for o in c.get("options") or []:
-                w(f"   - Option: {o}")
-            if c.get("settle_by"):
-                w(f"   - Settled by: {c['settle_by']}")
-            w("")
+    def check_quotes(self):
+        for r in self.reviews:
+            for f in r.get("findings", []):
+                self.stats["quotes_checked"] += 1
+                f["_quote_ok"] = quote_found(f.get("quote", ""), self.corpus) if self.texts else None
+                if f["_quote_ok"] is False:
+                    self.stats["quotes_missing"].append((r["key"], f.get("location", "")))
 
-    if syn.get("done_when"):
-        w("## Done when, measured")
-        w("")
-        w("| Criterion | Result | Evidence |")
-        w("|---|---|---|")
-        for d in syn["done_when"]:
-            w(f"| {cell(d['criterion'])} | {d['result']} | {cell(d['evidence'])} |")
-        w("")
+    def count_words(self):
+        for r in self.reviews:
+            if r.get("kind") == "persona":
+                r["_words"], r["_uncounted"] = path_words((r.get("walk") or {}).get("path"), self.texts)
 
-    if previous is not None:
-        w("## Against the previous round")
-        w("")
-        if syn.get("previous_priorities"):
-            w("| Previous priority | Status | Evidence |")
-            w("|---|---|---|")
-            for p in syn["previous_priorities"]:
-                w(f"| {cell(p['title'])} | {p['status']} | {cell(p['evidence'])} |")
-            w("")
-        prev_by_key = {r["key"]: r for r in previous.get("reviews", [])}
-        w(f"Previous round: {previous.get('date', '?')}"
-          f"{' at ' + previous['pin'] if previous.get('pin') else ''}. "
-          "Blocker / major / minor per reader, previous then now:")
-        w("")
-        w("| Reader | Previous | Now | Teach-back, previous then now |")
-        w("|---|---|---|---|")
-        for r in reviews:
-            p = prev_by_key.get(r["key"])
-            before = tally(p.get("findings", [])) if p else "not in previous round"
-            tb_now = (r.get("teach_back_check") or {}).get("verdict", "n/a")
-            tb_before = ((p or {}).get("teach_back_check") or {}).get("verdict", "n/a")
-            w(f"| {cell(labels[r['key']])} | {before} | {tally(r.get('findings', []))} | {tb_before} → {tb_now} |")
-        w("")
-        surviving = []
-        total_prev = 0
-        for p in previous.get("reviews", []):
-            for f in p.get("findings", []):
-                total_prev += 1
-                if quote_found(f.get("quote", ""), corpus):
-                    surviving.append((p["key"], f))
-        w(f"Of the previous round's {total_prev} kept findings, {len(surviving)} quote a passage that still "
-          "appears in the document. That counts surviving text, not surviving problems: a passage can stay "
-          "and its problem be fixed around it.")
-        blockers = [(k, f) for k, f in surviving if f.get("severity") == "blocker"]
-        if blockers:
-            w("")
-            w("Previous blockers whose passage survives:")
-            w("")
-            for k, f in blockers:
-                w(f"- {labels.get(k, k)}: {f.get('location')}: \"{f.get('quote')}\"")
-        w("")
 
-    personas = sorted([r for r in reviews if r.get("kind") == "persona"],
+def sec_header(c: Ctx) -> list[str]:
+    pin = c.result.get("pin") or c.ensemble.get("pin")
+    n_readers = len([r for r in c.reviews if r.get("kind") == "persona"])
+    n_lenses = len([r for r in c.reviews if r.get("kind") == "lens"])
+    at = f" at {pin}" if pin else ""
+    out = [
+        f"# Persona review: {c.result.get('title') or c.ensemble.get('title')}",
+        "",
+        f"Reviewed {c.result.get('date', '')}{at}. "
+        f"{n_readers} simulated {plural(n_readers, 'reader', 'readers')} and "
+        f"{n_lenses} editor {plural(n_lenses, 'lens', 'lenses')}. "
+        "The readers are a model playing people, so every finding about how a reader reacts is a "
+        "prediction to test, not an observation; see *Method and caveats*.",
+        "",
+    ]
+    if c.result.get("status") != "ok":
+        out += [f"**Run status: {c.result.get('status')}.** No review came back from: "
+                f"{names(c.method.get('failed'), c.labels) or 'none'}.", ""]
+    return out + ["## Summary", "", c.syn.get("summary", "(no synthesis)"), ""]
+
+
+def sec_priorities(c: Ctx) -> list[str]:
+    if not c.syn.get("priorities"):
+        return []
+    out = ["## Priorities", ""]
+    for i, p in enumerate(c.syn["priorities"], 1):
+        out += [f"### {i}. {p['title']}", "", p["rationale"], "",
+                f"Raised by: {names(p.get('raised_by'), c.labels)}. Where: {'; '.join(p.get('locations') or [])}.", ""]
+    return out
+
+
+def sec_conflicts(c: Ctx) -> list[str]:
+    if not c.syn.get("conflicts"):
+        return []
+    out = ["## Decisions for the author", "",
+           "Readers who want opposite things, or reader friction that collides with a design decision. "
+           "The reviews cannot settle these.", ""]
+    for i, x in enumerate(c.syn["conflicts"], 1):
+        kind = "Readers disagree" if x.get("kind") == "readers-disagree" else "Design collision"
+        out += [f"{i}. **{kind}.** {x['description']}", f"   - Between: {names(x.get('between'), c.labels)}."]
+        out += [f"   - Option: {o}" for o in x.get("options") or []]
+        if x.get("settle_by"):
+            out.append(f"   - Settled by: {x['settle_by']}")
+        out.append("")
+    return out
+
+
+def sec_done_when(c: Ctx) -> list[str]:
+    if not c.syn.get("done_when"):
+        return []
+    out = ["## Done when, measured", "", "| Criterion | Result | Evidence |", TABLE3]
+    out += [f"| {cell(d['criterion'])} | {d['result']} | {cell(d['evidence'])} |" for d in c.syn["done_when"]]
+    return out + [""]
+
+
+def sec_previous(c: Ctx) -> list[str]:
+    prev = c.previous
+    if prev is None:
+        return []
+    out = ["## Against the previous round", ""]
+    if c.syn.get("previous_priorities"):
+        out += ["| Previous priority | Status | Evidence |", TABLE3]
+        out += [f"| {cell(p['title'])} | {p['status']} | {cell(p['evidence'])} |" for p in c.syn["previous_priorities"]]
+        out.append("")
+    prev_by_key = {r["key"]: r for r in prev.get("reviews", [])}
+    prev_pin = f" at {prev['pin']}" if prev.get("pin") else ""
+    out += [f"Previous round: {prev.get('date', '?')}{prev_pin}. "
+            "Blocker / major / minor per reader, previous then now:", "",
+            "| Reader | Previous | Now | Teach-back, previous then now |", "|---|---|---|---|"]
+    for r in c.reviews:
+        p = prev_by_key.get(r["key"])
+        before = tally(p.get("findings", [])) if p else "not in previous round"
+        tb_before = verdict_of((p or {}).get("teach_back_check"))
+        out.append(f"| {cell(c.labels[r['key']])} | {before} | {tally(r.get('findings', []))} | "
+                   f"{tb_before} → {verdict_of(r.get('teach_back_check'))} |")
+    out.append("")
+    old = [(p["key"], f) for p in prev.get("reviews", []) for f in p.get("findings", [])]
+    surviving = [(k, f) for k, f in old if quote_found(f.get("quote", ""), c.corpus)]
+    out.append(f"Of the previous round's {len(old)} kept findings, {len(surviving)} quote a passage that still "
+               "appears in the document. That counts surviving text, not surviving problems: a passage can stay "
+               "and its problem be fixed around it.")
+    blockers = [(k, f) for k, f in surviving if f.get("severity") == "blocker"]
+    if blockers:
+        out += ["", "Previous blockers whose passage survives:", ""]
+        out += [f"- {c.labels.get(k, k)}: {f.get('location')}: \"{f.get('quote')}\"" for k, f in blockers]
+    return out + [""]
+
+
+def words_cell(r: dict) -> str:
+    total, budget = r["_words"], r.get("budget_words")
+    read = f"{total:,}{'+' if r['_uncounted'] else ''}"
+    if not budget:
+        return read
+    verdict = "over" if total > budget else "within"
+    return f"{read} / {budget:,} {verdict}"
+
+
+def sec_readers(c: Ctx) -> list[str]:
+    personas = sorted([r for r in c.reviews if r.get("kind") == "persona"],
                       key=lambda r: TIER_ORDER.get(r.get("tier"), 4))
-    if personas:
-        w("## The readers")
-        w("")
-        w("Teach-back is the verifier's judgement of what the reader came away with. Goal reached, path "
-          "and stop point are the simulated reader's own account, and words read is computed from that "
-          "account: self-reports, not measurements.")
-        w("")
-        w("| Reader | Tier | Mode | Teach-back (verified) | Goal reached (self-report) | Words read / budget | Path | B / M / m |")
-        w("|---|---|---|---|---|---|---|---|")
-        for r in personas:
-            walk = r.get("walk") or {}
-            total, uncounted = path_words(walk.get("path"), texts)
-            r["_words"], r["_uncounted"] = total, uncounted
-            budget = r.get("budget_words")
-            over = ""
-            if budget:
-                over = " over" if total > budget else " within"
-            words_cell = f"{total:,}{'+' if uncounted else ''} / {budget:,}{over}" if budget else f"{total:,}{'+' if uncounted else ''}"
-            states = " → ".join(s.get("state", "?") for s in walk.get("path") or [])
-            tb = (r.get("teach_back_check") or {}).get("verdict", "n/a")
-            w(f"| {cell(labels[r['key']])} | {r.get('tier') or ''} | {r.get('mode') or 'walk'} | {tb} | "
-              f"{walk.get('goal_reached', '')} | {words_cell} | {cell(states)} | {tally(r.get('findings', []))} |")
-        w("")
-        w("A `+` after the word count means some locations on the path could not be counted "
-          "(listed per reader below).")
-        w("")
-
-    if syn.get("themes"):
-        w("## Themes")
-        w("")
-        for t in sorted(syn["themes"], key=lambda x: SEV_ORDER.get(x.get("severity"), 3)):
-            w(f"### [{t['severity']}] {t['theme']}")
-            w("")
-            w(f"Raised by: {names(t.get('raised_by'), labels)}.")
-            w("")
-            w(t["summary"])
-            w("")
-            if t.get("locations"):
-                w(f"Where: {'; '.join(t['locations'])}.")
-                w("")
-
-    tests = ensemble.get("reader_tests") or []
-    if tests:
-        outcomes: dict[str, int] = {}
-        for t in tests:
-            outcomes[t.get("outcome", "untested")] = outcomes.get(t.get("outcome", "untested"), 0) + 1
-        w("## Predictions tested on real readers so far")
-        w("")
-        w(", ".join(f"{n} {k}" for k, n in sorted(outcomes.items())) + ".")
-        w("")
-        for t in tests:
-            w(f"- {t.get('hypothesis')}: **{t.get('outcome')}**{(' (' + t['note'] + ')') if t.get('note') else ''}")
-        w("")
-
-    if syn.get("validate_with_readers"):
-        w("## Check with real readers")
-        w("")
-        w("Predictions about reader behaviour that drive a priority. A cheap test: give one or two real "
-          "readers of that kind the passage, ask them to mark what helps (+) and what hinders (-) as they "
-          "read, then ask why.")
-        w("")
-        for v in syn["validate_with_readers"]:
-            w(f"- **{v['hypothesis']}** ({names(v.get('raised_by'), labels)}). Test: {v['test']}")
-        w("")
-
-    w("## Per reviewer")
-    w("")
-    for r in sorted(reviews, key=lambda r: (r.get("kind") != "persona", TIER_ORDER.get(r.get("tier"), 4))):
-        w(f"### {labels[r['key']]}")
-        w("")
-        if r.get("kind") == "persona":
-            w(f"Tier: {r.get('tier')}. Goal: {r.get('goal')} Entry: {r.get('entry')}")
-            w("")
-        w(f"**Verdict.** {r.get('verdict', '')}")
-        w("")
+    if not personas:
+        return []
+    out = ["## The readers", "",
+           "Teach-back is the verifier's judgement of what the reader came away with. Goal reached, path "
+           "and stop point are the simulated reader's own account, and words read is computed from that "
+           "account: self-reports, not measurements.", "",
+           "| Reader | Tier | Mode | Teach-back (verified) | Goal reached (self-report) | Words read / budget | Path | B / M / m |",
+           "|---|---|---|---|---|---|---|---|"]
+    for r in personas:
         walk = r.get("walk") or {}
-        if walk.get("path"):
-            w("**Path.** " + " → ".join(f"{s.get('location')} ({s.get('state')})" for s in walk["path"]))
-            w("")
-            w(f"Walk ended at {walk.get('stop_point')}. {walk.get('stop_reason')} Goal reached: {walk.get('goal_reached')}.")
-            if r.get("_uncounted"):
-                w(f"Not counted in words read: {', '.join(r['_uncounted'])}.")
-            w("")
-        if r.get("came_for"):
-            w("| Came for | Met | Where |")
-            w("|---|---|---|")
-            for c in r["came_for"]:
-                w(f"| {cell(c['expectation'])} | {c['met']} | {cell(c['where'])} |")
-            w("")
-        if r.get("teach_back"):
-            w(f"**Teach-back.** {r['teach_back']}")
-            w("")
-            tbc = r.get("teach_back_check")
-            if tbc:
-                w(f"Verifier: **{tbc.get('verdict')}**. {tbc.get('reason', '')}")
-                if tbc.get("takeaways_missed"):
-                    w(f"Intended takeaways missed: {'; '.join(tbc['takeaways_missed'])}.")
-                w("")
-        if r.get("strengths"):
-            w("**What works.**")
-            w("")
-            for s in r["strengths"]:
-                w(f"- {s}")
-            w("")
-        if r.get("top_priorities"):
-            w("**This reviewer's priorities.**")
-            w("")
-            for i, p in enumerate(r["top_priorities"], 1):
-                w(f"{i}. {p}")
-            w("")
-        if r.get("findings"):
-            w("**Findings.**")
-            w("")
-            for f in sorted(r["findings"], key=lambda x: SEV_ORDER.get(x.get("severity"), 3)):
-                raised = f" (reported {f['severity_as_reported']}; raised by the tier rule)" if f.get("severity_as_reported") else ""
-                beyond = ", past the stop point" if f.get("beyond_stop") else ""
-                by_verifier = " (found by the verifier, not the reviewer)" if f.get("found_by") == "verifier" else ""
-                w(f"- **[{f.get('severity')} / {f.get('kind')}]**{raised}{by_verifier} {f.get('location')}{beyond}")
-                flag = "" if f.get("_quote_ok") is not False else " **(quote not found by the script; check before acting)**"
-                w(f"  - Quote: \"{f.get('quote')}\"{flag}")
-                w(f"  - Issue: {f.get('issue')}")
-                w(f"  - Needed: {f.get('expected')}")
-                v = f.get("verification") or {}
-                if v.get("verdict") not in (None, "unchecked", "verifier-found"):
-                    line = f"  - Verified: {v['verdict']}. {v.get('reason', '')}"
-                    if v.get("adjusted"):
-                        line += f" Adjusted: {v['adjusted']}"
-                    w(line)
-                elif f.get("basis") == "recall":
-                    w("  - Rests on the reviewer's recall and was not verified.")
-            w("")
-        if r.get("cap_skipped"):
-            w(f"{r['cap_skipped']} major finding(s) went unverified because of the per-reviewer cap.")
-            w("")
+        states = " → ".join(s.get("state", "?") for s in walk.get("path") or [])
+        out.append(f"| {cell(c.labels[r['key']])} | {r.get('tier') or ''} | {r.get('mode') or 'walk'} | "
+                   f"{verdict_of(r.get('teach_back_check'))} | {walk.get('goal_reached', '')} | {words_cell(r)} | "
+                   f"{cell(states)} | {tally(r.get('findings', []))} |")
+    return out + ["", "A `+` after the word count means some locations on the path could not be counted "
+                  "(listed per reader below).", ""]
 
-    dropped = result.get("dropped") or []
-    if dropped:
-        w("## Dropped findings")
-        w("")
-        w("Removed before the synthesis because a verifier refuted them or could not find their quote. "
-          "Listed so a wrong refutation can be caught.")
-        w("")
-        for f in dropped:
-            v = f.get("verification") or {}
-            why = "quote not found" if v.get("quote_found") is False else v.get("verdict")
-            w(f"- {labels.get(f.get('reviewer'), f.get('reviewer'))}, {f.get('location')} ({why}): "
-              f"{f.get('issue')} Verifier: {v.get('reason', '')}")
-        w("")
 
-    w("## Method and caveats")
-    w("")
-    runner = method.get("runner", "?")
-    blind = method.get("blind")
-    w(f"- Runner: {runner}; reviewers {'blind to one another' if blind else 'NOT blind: one context wrote every review, so later reviews saw earlier ones'}. "
-      f"Model: {method.get('model', '?')}; verifier model: {method.get('verify_model', method.get('model', '?'))}.")
-    raised_n = sum(len([f for f in r.get("findings", []) if f.get("found_by") != "verifier"]) for r in reviews) + len(dropped)
-    added_n = sum(len([f for f in r.get("findings", []) if f.get("found_by") == "verifier"]) for r in reviews)
-    checked_n = sum(len([f for f in r.get("findings", []) if (f.get("verification") or {}).get("verdict") in ("confirmed", "adjusted")]) for r in reviews) + \
-        len([f for f in dropped if (f.get("verification") or {}).get("verdict") == "refuted"])
-    w(f"- Verification: a verifier located every quote and tried to refute up to "
-      f"{method.get('max_verify_per_reviewer', '?')} major claims per reviewer; the rest are unverified. "
-      f"Reviewers raised {raised_n} findings; {checked_n} were put to refutation, and {len(dropped)} were dropped "
-      f"(refuted or quote not found). Verifiers added {added_n} the reviewers missed.")
-    per = [f"{labels.get(r['key'], r['key'])} {r.get('refuted', 0)} of "
-           f"{len([f for f in r.get('findings', []) if f.get('found_by') != 'verifier']) + r.get('refuted', 0)}"
-           for r in reviews]
-    w(f"- Dropped per reviewer: {'; '.join(per)}. A verifier is the same model as the reviewer and can drop "
-      "true findings too; read *Dropped findings*.")
-    if texts:
-        w(f"- Quote check: {stats['quotes_checked']} quotes searched in {len(texts)} file(s); "
-          f"{len(stats['quotes_missing'])} not found"
-          + (": " + "; ".join(f"{labels.get(k, k)} at {loc}" for k, loc in stats["quotes_missing"]) if stats["quotes_missing"] else "") + ".")
+def sec_themes(c: Ctx) -> list[str]:
+    if not c.syn.get("themes"):
+        return []
+    out = ["## Themes", ""]
+    for t in sorted(c.syn["themes"], key=lambda x: SEV_ORDER.get(x.get("severity"), 3)):
+        out += [f"### [{t['severity']}] {t['theme']}", "", f"Raised by: {names(t.get('raised_by'), c.labels)}.", "",
+                t["summary"], ""]
+        if t.get("locations"):
+            out += [f"Where: {'; '.join(t['locations'])}.", ""]
+    return out
+
+
+def sec_reader_tests(c: Ctx) -> list[str]:
+    tests = c.ensemble.get("reader_tests") or []
+    if not tests:
+        return []
+    outcomes: dict[str, int] = {}
+    for t in tests:
+        outcomes[t.get("outcome", "untested")] = outcomes.get(t.get("outcome", "untested"), 0) + 1
+    out = ["## Predictions tested on real readers so far", "",
+           ", ".join(f"{n} {k}" for k, n in sorted(outcomes.items())) + ".", ""]
+    for t in tests:
+        note = f" ({t['note']})" if t.get("note") else ""
+        out.append(f"- {t.get('hypothesis')}: **{t.get('outcome')}**{note}")
+    return out + [""]
+
+
+def sec_validate(c: Ctx) -> list[str]:
+    if not c.syn.get("validate_with_readers"):
+        return []
+    out = ["## Check with real readers", "",
+           "Predictions about reader behaviour that drive a priority. A cheap test: give one or two real "
+           "readers of that kind the passage, ask them to mark what helps (+) and what hinders (-) as they "
+           "read, then ask why.", ""]
+    out += [f"- **{v['hypothesis']}** ({names(v.get('raised_by'), c.labels)}). Test: {v['test']}"
+            for v in c.syn["validate_with_readers"]]
+    return out + [""]
+
+
+def finding_lines(f: dict) -> list[str]:
+    raised = f" (reported {f['severity_as_reported']}; raised by the tier rule)" if f.get("severity_as_reported") else ""
+    beyond = ", past the stop point" if f.get("beyond_stop") else ""
+    by_verifier = " (found by the verifier, not the reviewer)" if f.get("found_by") == "verifier" else ""
+    flag = "" if f.get("_quote_ok") is not False else " **(quote not found by the script; check before acting)**"
+    out = [f"- **[{f.get('severity')} / {f.get('kind')}]**{raised}{by_verifier} {f.get('location')}{beyond}",
+           f"  - Quote: \"{f.get('quote')}\"{flag}",
+           f"  - Issue: {f.get('issue')}",
+           f"  - Needed: {f.get('expected')}"]
+    v = f.get("verification") or {}
+    if v.get("verdict") not in (None, "unchecked", "verifier-found"):
+        line = f"  - Verified: {v['verdict']}. {v.get('reason', '')}"
+        if v.get("adjusted"):
+            line += f" Adjusted: {v['adjusted']}"
+        out.append(line)
+    elif f.get("basis") == "recall":
+        out.append("  - Rests on the reviewer's recall and was not verified.")
+    return out
+
+
+def walk_lines(r: dict) -> list[str]:
+    walk = r.get("walk") or {}
+    if not walk.get("path"):
+        return []
+    out = ["**Path.** " + " → ".join(f"{s.get('location')} ({s.get('state')})" for s in walk["path"]), "",
+           f"Walk ended at {walk.get('stop_point')}. {walk.get('stop_reason')} Goal reached: {walk.get('goal_reached')}."]
+    if r.get("_uncounted"):
+        out.append(f"Not counted in words read: {', '.join(r['_uncounted'])}.")
+    return out + [""]
+
+
+def teach_back_lines(r: dict) -> list[str]:
+    if not r.get("teach_back"):
+        return []
+    out = [f"**Teach-back.** {r['teach_back']}", ""]
+    tbc = r.get("teach_back_check")
+    if tbc:
+        out.append(f"Verifier: **{tbc.get('verdict')}**. {tbc.get('reason', '')}")
+        if tbc.get("takeaways_missed"):
+            out.append(f"Intended takeaways missed: {'; '.join(tbc['takeaways_missed'])}.")
+        out.append("")
+    return out
+
+
+def reviewer_lines(c: Ctx, r: dict) -> list[str]:
+    out = [f"### {c.labels[r['key']]}", ""]
+    if r.get("kind") == "persona":
+        out += [f"Tier: {r.get('tier')}. Goal: {r.get('goal')} Entry: {r.get('entry')}", ""]
+    out += [f"**Verdict.** {r.get('verdict', '')}", ""]
+    out += walk_lines(r)
+    if r.get("came_for"):
+        out += ["| Came for | Met | Where |", TABLE3]
+        out += [f"| {cell(x['expectation'])} | {x['met']} | {cell(x['where'])} |" for x in r["came_for"]]
+        out.append("")
+    out += teach_back_lines(r)
+    if r.get("strengths"):
+        out += ["**What works.**", ""] + [f"- {s}" for s in r["strengths"]] + [""]
+    if r.get("top_priorities"):
+        out += ["**This reviewer's priorities.**", ""]
+        out += [f"{i}. {p}" for i, p in enumerate(r["top_priorities"], 1)] + [""]
+    if r.get("findings"):
+        out += ["**Findings.**", ""]
+        for f in sorted(r["findings"], key=lambda x: SEV_ORDER.get(x.get("severity"), 3)):
+            out += finding_lines(f)
+        out.append("")
+    if r.get("cap_skipped"):
+        out += [f"{r['cap_skipped']} major finding(s) went unverified because of the per-reviewer cap.", ""]
+    return out
+
+
+def sec_reviewers(c: Ctx) -> list[str]:
+    out = ["## Per reviewer", ""]
+    for r in sorted(c.reviews, key=lambda r: (r.get("kind") != "persona", TIER_ORDER.get(r.get("tier"), 4))):
+        out += reviewer_lines(c, r)
+    return out
+
+
+def sec_dropped(c: Ctx) -> list[str]:
+    if not c.dropped:
+        return []
+    out = ["## Dropped findings", "",
+           "Removed before the synthesis because a verifier refuted them or could not find their quote. "
+           "Listed so a wrong refutation can be caught.", ""]
+    for f in c.dropped:
+        v = f.get("verification") or {}
+        why = "quote not found" if v.get("quote_found") is False else v.get("verdict")
+        out.append(f"- {c.labels.get(f.get('reviewer'), f.get('reviewer'))}, {f.get('location')} ({why}): "
+                   f"{f.get('issue')} Verifier: {v.get('reason', '')}")
+    return out + [""]
+
+
+def own(r: dict) -> list[dict]:
+    """The findings a reviewer raised itself, kept after verification."""
+    return [f for f in r.get("findings", []) if f.get("found_by") != "verifier"]
+
+
+def sec_method(c: Ctx) -> list[str]:
+    m = c.method
+    blind = ("blind to one another" if m.get("blind")
+             else "NOT blind: one context wrote every review, so later reviews saw earlier ones")
+    raised_n = sum(len(own(r)) for r in c.reviews) + len(c.dropped)
+    added_n = sum(len(r.get("findings", [])) - len(own(r)) for r in c.reviews)
+    put_to_refutation = ("confirmed", "adjusted")
+    checked_n = sum(1 for r in c.reviews for f in r.get("findings", [])
+                    if (f.get("verification") or {}).get("verdict") in put_to_refutation)
+    checked_n += sum(1 for f in c.dropped if (f.get("verification") or {}).get("verdict") == "refuted")
+    per = [f"{c.labels.get(r['key'], r['key'])} {r.get('refuted', 0)} of {len(own(r)) + r.get('refuted', 0)}"
+           for r in c.reviews]
+    out = ["## Method and caveats", "",
+           f"- Runner: {m.get('runner', '?')}; reviewers {blind}. "
+           f"Model: {m.get('model', '?')}; verifier model: {m.get('verify_model', m.get('model', '?'))}.",
+           f"- Verification: a verifier located every quote and tried to refute up to "
+           f"{m.get('max_verify_per_reviewer', '?')} major claims per reviewer; the rest are unverified. "
+           f"Reviewers raised {raised_n} findings; {checked_n} were put to refutation, and {len(c.dropped)} were dropped "
+           f"(refuted or quote not found). Verifiers added {added_n} the reviewers missed.",
+           f"- Dropped per reviewer: {'; '.join(per)}. A verifier is the same model as the reviewer and can drop "
+           "true findings too; read *Dropped findings*."]
+    missing = c.stats["quotes_missing"]
+    if c.texts:
+        where = ": " + "; ".join(f"{c.labels.get(k, k)} at {loc}" for k, loc in missing) if missing else ""
+        out.append(f"- Quote check: {c.stats['quotes_checked']} quotes searched in {len(c.texts)} file(s); "
+                   f"{len(missing)} not found{where}.")
     else:
-        w("- Quote check: not run; no reader files were found under the root.")
-    w("- No check here measures what every reviewer missed. The verifiers' own search for missed problems "
-      "is the only one, and it is the same model again.")
-    w("- Simulated readers predict reader problems; they do not observe them. Human experts asked to predict "
-      "what real readers will struggle with catch a minority of it and add problems readers never have, so "
-      "treat reader-experience findings as hypotheses and test the ones that matter.")
-    w("- The reviewers are one model wearing different briefs. Their agreement is weaker evidence than "
-      "agreement between independent people, and their satisfaction is not evidence of quality: models "
-      "playing readers are kinder than readers, and favour text written by models.")
-    if ensemble.get("drafted_with_ai"):
-        w("- The document was drafted with an AI model, so expect these reviewers to under-flag its problems; "
-          "weigh the editor lenses and the verified correctness findings over reader satisfaction.")
-    for line in method.get("log") or []:
-        w(f"- Run log: {line}")
-    if prev_texts_note:
-        w(f"- {prev_texts_note}")
-    w("")
+        out.append("- Quote check: not run; no reader files were found under the root.")
+    out += RULE_CAVEATS
+    if c.ensemble.get("drafted_with_ai"):
+        out.append("- The document was drafted with an AI model, so expect these reviewers to under-flag its problems; "
+                   "weigh the editor lenses and the verified correctness findings over reader satisfaction.")
+    out += [f"- Run log: {line}" for line in m.get("log") or []]
+    return out + [""]
 
-    text = "\n".join(out)
-    return re.sub(r"\n{3,}", "\n\n", text).rstrip() + "\n", stats
+
+SECTIONS = [sec_header, sec_priorities, sec_conflicts, sec_done_when, sec_previous, sec_readers,
+            sec_themes, sec_reader_tests, sec_validate, sec_reviewers, sec_dropped, sec_method]
+
+
+def build(ensemble: dict, result: dict, texts: dict[str, str], previous: dict | None) -> tuple[str, dict]:
+    c = Ctx(ensemble, result, texts, previous)
+    c.check_quotes()
+    c.count_words()
+    lines: list[str] = []
+    for render in SECTIONS:
+        lines += render(c)
+    text = "\n".join(lines)
+    return re.sub(r"\n{3,}", "\n\n", text).rstrip() + "\n", c.stats
 
 
 def main() -> int:
@@ -521,7 +569,7 @@ def main() -> int:
         patterns += p.get("reader_files") or []
     texts = resolve_files(patterns, root)
     previous = load_json(under_cwd(a.previous)) if a.previous else None
-    report, stats = build(ensemble, result, texts, previous, None)
+    report, stats = build(ensemble, result, texts, previous)
     out = under_cwd(a.output) if a.output else result_path.parent / "report.md"
     out.write_text(report, encoding="utf-8")
     print(f"wrote {out}: {stats['quotes_checked']} quotes checked, {len(stats['quotes_missing'])} not found")
