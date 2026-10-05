@@ -1,0 +1,9 @@
+{
+  "summary": "Not ready for its primary reader: the newcomer ends the walk misled about SYNC_DIR.",
+  "priorities": [{"title": "Say what SYNC_DIR is on a laptop", "rationale": "The primary reader's teach-back was wrong.", "raised_by": ["newcomer"], "locations": ["doc.md#Configure"]}],
+  "themes": [],
+  "conflicts": [{"kind": "design-collision", "description": "One page only vs a laptop section.", "between": ["newcomer", "one-page design"], "options": ["Add a sentence", "Add a page"], "settle_by": "Watch one newcomer install it."}],
+  "validate_with_readers": [{"hypothesis": "Newcomers leave SYNC_DIR at /data.", "raised_by": ["newcomer"], "test": "Ask one newcomer to install it and watch."}],
+  "done_when": [{"criterion": "No primary reader ends the walk misled", "result": "not met", "evidence": "The newcomer's teach-back was judged wrong."}],
+  "previous_priorities": []
+}

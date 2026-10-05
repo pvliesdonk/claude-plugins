@@ -1,0 +1,58 @@
+{
+  "verdict": "Enough to say go for a trial.",
+  "walk": {
+    "path": [
+      {
+        "location": "doc.md",
+        "state": "oriented",
+        "note": ""
+      }
+    ],
+    "stop_point": "read to the end",
+    "stop_reason": "Short page.",
+    "goal_reached": "n/a"
+  },
+  "came_for": [
+    {
+      "expectation": "What it does",
+      "met": "yes",
+      "where": "doc.md"
+    },
+    {
+      "expectation": "Which platforms",
+      "met": "yes",
+      "where": "doc.md"
+    }
+  ],
+  "teach_back": "",
+  "strengths": [
+    "doc.md: the first line says what it is."
+  ],
+  "findings": [
+    {
+      "location": "doc.md",
+      "quote": "copies your notes between all devices",
+      "kind": "unclear",
+      "severity": "minor",
+      "blocks_goal": false,
+      "basis": "reaction",
+      "beyond_stop": false,
+      "issue": "Which devices?",
+      "expected": "A list."
+    },
+    {
+      "location": "doc.md#Security",
+      "quote": "All traffic is encrypted with TLS 1.3.",
+      "kind": "absent",
+      "severity": "major",
+      "blocks_goal": true,
+      "basis": "reaction",
+      "beyond_stop": false,
+      "issue": "Nothing on where data is stored.",
+      "expected": "Where my notes live."
+    }
+  ],
+  "top_priorities": [
+    "List supported devices."
+  ]
+}

@@ -63,6 +63,17 @@
       "homepage": "https://github.com/pvliesdonk/claude-plugins/tree/main/plugins/open-knowledge-format"
     },
     {
+      "name": "persona-review",
+      "description": "Review a document as its readers would before they do: simulated readers who know only what a real reader knows walk or read it towards their own purpose, editors apply rubrics, a verifier per reviewer locates every quote and tries to refute the major claims, and a synthesis ranks what survives as predictions to test with real readers.",
+      "author": {
+        "name": "Peter van Liesdonk",
+        "email": "peter@liesdonk.nl"
+      },
+      "source": "./plugins/persona-review",
+      "category": "writing",
+      "homepage": "https://github.com/pvliesdonk/claude-plugins/tree/main/plugins/persona-review"
+    },
+    {
       "name": "preflight-circus",
       "description": "A blind six-lens review gate over BASE..HEAD, run before you push rather than after — the same examination a post-push review bot applies, sat while the diff is still local.",
       "author": {

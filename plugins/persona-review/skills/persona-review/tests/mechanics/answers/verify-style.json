@@ -1,0 +1,16 @@
+{
+  "checks": [
+    {
+      "index": 0,
+      "quote_found": true,
+      "verdict": "unchecked",
+      "reason": ""
+    }
+  ],
+  "teach_back": {
+    "verdict": "n/a",
+    "reason": "",
+    "takeaways_missed": []
+  },
+  "missed": []
+}
