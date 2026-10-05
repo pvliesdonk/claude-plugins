@@ -146,8 +146,10 @@ async function parallel(thunks) {
 }
 
 const logs = []
-const log = (m) => { logs.push(m); console.error(`[log] ${m}`) }
-const phase = (t) => console.error(`[phase] ${t}`)
+// Held back until the run completes: in a pass with prompts pending, the
+// workflow's "no review returned" lines describe unanswered prompts, not failures.
+const log = (m) => { logs.push(m) }
+const phase = () => {}
 const budget = { total: null, spent: () => 0, remaining: () => Infinity }
 const workflow = () => { throw new Error('nested workflows are not supported offline') }
 
@@ -181,6 +183,7 @@ if (!result || result.status === 'error') {
   process.exit(1)
 }
 
+for (const m of logs) console.error(`[log] ${m}`)
 result.method.runner = runner === 'in-context' ? 'in-context' : 'agent-tool'
 result.method.blind = runner !== 'in-context'
 result.method.log = logs
