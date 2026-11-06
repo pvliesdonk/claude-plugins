@@ -4,8 +4,9 @@ The GitLab counterpart of [mechanics.md](mechanics.md). Same disciplines, differ
 traps. Works for gitlab.com and for any self-managed instance; nothing here assumes
 a hostname.
 
-Verified against the GitLab REST API v4 and `glab` documentation as of GitLab 19.x
-and glab 1.128. Self-managed instances lag: **read the instance version first** and
+Checked against the GitLab REST API v4 and `glab` documentation (GitLab 19.x, glab
+1.128, last checked 2026-11), **not against a live instance**. The version numbers
+below are the claims most likely to rot. Self-managed instances lag: **read the instance version first** and
 treat any feature below marked with a version as absent until you have checked.
 
 ## Step 0: Which instance, which version, which tier
@@ -25,10 +26,11 @@ glab api metadata | jq '{version, enterprise, plan}'
 
 - `enterprise: false` means Community Edition: **Free-tier features only**, whatever
   anyone tells you.
-- `plan` names the licence (`free`, `premium`, `ultimate`). It is `null` on gitlab.com,
-  where licences are per namespace, and older instances may not return it at all. When
-  you cannot read the tier, probe the feature you need (for example, list a group's
-  epics) and treat a 403/404 as "not available here".
+- `plan` names the licence (`free`, `premium`, `ultimate`), but it is a recent addition
+  to `/metadata`: older instances omit it, and it is `null` on gitlab.com, where
+  licences are per namespace. **Treat probing as the primary path**: try the feature you
+  need (for example, list a group's epics) and read a 403/404 as "not available here".
+  Use `plan` only to confirm what the probe found.
 
 Tier-gated features this file touches:
 
@@ -60,7 +62,7 @@ already been renamed once: `get_issue` / `create_issue` were superseded by
 `get_work_item` / `save_work_item` in 19.4. **Read the tool list the server actually
 gives you**; never call a tool name from memory or from this file.
 
-## ⚠️ Four Traps
+## ⚠️ Five Traps
 
 **1. A typo creates a label.** `add_labels`, `labels`, and therefore
 `glab issue update --label`, create a new *project* label when the name does not
@@ -86,6 +88,10 @@ same-named label in the group's other projects into it.
 **4. iid versus id.** Issues have a project-scoped `iid` (the `#123` humans see) and a
 global `id`. Project-scoped endpoints take the iid; `milestone_id` takes the
 milestone's *global* ID, not its iid and not its title. Look it up first.
+
+**5. Label names in URL paths.** Label endpoints accept a title in the path
+(`labels/ci`), which is fine for plain names. For a scoped name (`area::ci`), or one
+with spaces or slashes, use the label's numeric `id` from the listing instead.
 
 ## Discovery
 
@@ -179,9 +185,12 @@ Merge requests are `!N`, issues `#N`, milestones `%"title"`, labels `~"name"`, e
 ## Dependencies and Hierarchy
 
 ```bash
-# Directed link (Premium+): this issue is blocked by #859
+# Directed link (Premium+): this issue is blocked by #859.
+# target_project_id is required even within one project. In the body it is the numeric
+# ID (or the plain path group/project); URL-encoding (%2F) is for URL paths only.
+PID=$(glab api "projects/:fullpath" | jq .id)
 glab api -X POST "projects/:fullpath/issues/809/links" \
-  -f target_project_id="GROUP%2FPROJECT" -f target_issue_iid=859 -f link_type=is_blocked_by
+  -f target_project_id="$PID" -f target_issue_iid=859 -f link_type=is_blocked_by
 
 # The same as a quick action (Premium+). On Free only /relate works, and it carries no direction.
 glab issue note 809 -m "/blocked_by #859"
@@ -222,7 +231,8 @@ glab api --paginate "projects/:fullpath/labels?with_counts=true&include_ancestor
 # The counts do NOT include closed or merged MRs. Count those separately before deleting:
 glab api --paginate "projects/:fullpath/merge_requests?state=all&labels=enhancement" | jq length
 
-# RENAME preserves assignments. Project label:
+# RENAME preserves assignments. Title-in-path is fine for plain names; use the id for scoped ones (trap 5).
+# Project label:
 glab api -X PUT "projects/:fullpath/labels/ci" -f new_name="area::ci" -f description="CI, release machinery"
 # Group label — this renames it in EVERY project of the group. Confirm that explicitly:
 glab api -X PUT "groups/GROUP%2FSUBGROUP/labels/ci" -f new_name="area::ci"

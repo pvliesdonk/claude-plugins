@@ -33,11 +33,16 @@ git remote get-url origin
 
 - `github.com` (or a GitHub Enterprise host) — the `gh` commands in this file and
   [mechanics.md](mechanics.md) apply.
-- Anything else that answers `glab api version` — **GitLab**, hosted or self-managed.
+- Otherwise, a host that answers `glab api version` is **GitLab**, hosted or
+  self-managed. (A GitHub Enterprise host fails this probe, which is why the GitHub
+  check comes first.)
   Read [mechanics-gitlab.md](mechanics-gitlab.md) Step 0 first: on GitLab the
   instance **version and licence tier** decide whether scoped labels are exclusive,
   whether issues can block each other, and whether labels can be archived. State the
   host, version and tier you found before proposing anything.
+
+- Neither (Gitea, Forgejo, Bitbucket, …) — stop and say so. The disciplines still
+  apply, but there are no verified mechanics for that forge; do not improvise commands.
 
 Where this file shows a `gh` command, mechanics-gitlab.md has the GitLab equivalent.
 Vocabulary: a GitHub pull request is a GitLab merge request (`!N`), and GitLab has no

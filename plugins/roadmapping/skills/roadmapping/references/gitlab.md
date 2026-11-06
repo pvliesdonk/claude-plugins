@@ -12,9 +12,10 @@ git remote get-url origin                       # the host; never assume gitlab.
 glab api metadata | jq '{version, enterprise, plan}'
 ```
 
-`enterprise: false` is Community Edition, which is Free tier. `plan` is `null` on
-gitlab.com, where tiers are per namespace; probe a feature (list the group's epics)
-when you cannot read it. Record host, version and tier in the medium stanza alongside
+`enterprise: false` is Community Edition, which is Free tier. Otherwise probe the
+feature you need (list the group's epics; create nothing) and read a 403/404 as
+absent. `plan` is recent, missing on older instances and `null` on gitlab.com, so use
+it to confirm the probe, not to replace it. Record host, version and tier in the medium stanza alongside
 where the index and milestones live: the next session needs them before it can trust
 any command.
 
@@ -31,6 +32,10 @@ default for you. Ask, then record the answer in the stanza.
 | Frees milestones for | nothing; the release-payload conflict in `SKILL.md` applies in full | release payloads, so both conventions can coexist |
 | Refinement issue | required, as written | still required: an epic with no children reports nothing honestly either |
 | Acceptance criterion | in the milestone description | in the epic description |
+
+With group epics, the refinement issue still has to live in a project, because epics
+are group-level and issues are not. Put it in the project that holds the index, attach
+it to the epic as a child, and record that choice in the stanza.
 
 On Free there is no choice: milestone as epic. On Premium+, the epic option removes
 the one structural conflict `SKILL.md` warns about, at the price of the roadmap living
@@ -74,8 +79,9 @@ GitHub does.
 # refine-B (#42) is blocked by feature X in milestone A (#17)
 glab issue note 42 -m "/blocked_by #17"
 # or through the API, which also works across projects
+# target_project_id: numeric ID (or plain group/project) in the body, never %2F
 glab api -X POST "projects/:fullpath/issues/42/links" \
-  -f target_project_id="GROUP%2FPROJECT" -f target_issue_iid=17 -f link_type=is_blocked_by
+  -f target_project_id="$(glab api "projects/:fullpath" | jq .id)" -f target_issue_iid=17 -f link_type=is_blocked_by
 # read the edges
 glab api "projects/:fullpath/issues/42/links" | jq -r '.[] | "\(.link_type)\t#\(.iid)\t\(.title)"'
 ```
@@ -92,8 +98,10 @@ relies on **cannot be expressed natively.** Do not paper over that:
 - Do not quietly fall back to prose ordering in the index either; `SKILL.md` is right
   that prose which could have been an edge drifts.
 - Say plainly that the instance cannot hold the graph, and propose a convention to the
-  user: for example, a fixed first line in the dependent issue's description,
-  `Blocked by: #17`, plus a `relates_to` link so the two issues still find each other.
+  user: for example, a fixed first line in the dependent issue's **description** (not a
+  note, so it stays current and searchable), `Blocked by: #17`, written as
+  `group/project#17` whenever the blocker is in another project, plus a `relates_to`
+  link so the two issues still find each other.
   It is queryable with a text search, which is weaker than a native edge and stronger
   than a sentence in the index. Record the convention in the stanza, and tag it
   `derived` until the user adopts it.
