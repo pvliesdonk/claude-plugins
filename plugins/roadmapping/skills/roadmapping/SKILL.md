@@ -43,6 +43,14 @@ finding out is itself work: file it as a research issue. The evidence rule
 defers the research, it does not cancel it. Read *Everything is work* below
 before you decide an unknown has no owner.
 
+## The forge
+
+This skill is written in GitHub's vocabulary because GitHub offers the fewest objects.
+On **GitLab** (gitlab.com or self-managed) read `references/gitlab.md` before charting:
+there, which object plays the epic is a choice to record, directed dependencies are a
+Premium feature, and milestones and epics carry dates that pull against the stop rules.
+The rules themselves do not change.
+
 ## The model
 
 Three objects, and each holds exactly one kind of fact.
@@ -303,7 +311,10 @@ The roadmap must still be findable in six months, by an agent that has none of
 this conversation. On first use, establish and record:
 
 - where the index lives (repo path)
-- where milestones live (repo, or org-level project)
+- where milestones live (repo, or org-level project; on GitLab, project or group, and
+  whether the epic is a milestone or a GitLab epic)
+- on GitLab: the host, the instance version and tier, and the dependency convention
+  in use if directed links are unavailable
 - the pointer stanza written into `CLAUDE.md` / `AGENTS.md`
 
 The stanza contains a **pointer, never content**. Content in an instruction

@@ -1,6 +1,6 @@
 ---
 name: triaging-issues
-description: Use when sorting or cleaning up a GitHub issue backlog, deciding an issue's labels, priority or milestone, setting up labels in a repo that has none or only GitHub's defaults, or curating a label set that has grown duplicates and dead entries.
+description: Use when sorting or cleaning up a GitHub or GitLab issue backlog (gitlab.com or self-managed), deciding an issue's labels, priority or milestone, setting up labels in a repo that has none or only GitHub's defaults, or curating a label set that has grown duplicates and dead entries.
 ---
 
 # Triaging Issues
@@ -22,6 +22,32 @@ states a rule — `CONTRIBUTING.md`, an issue form, a documented scheme — **th
 and this skill is the fallback**; where it states nothing, everything here applies as
 written. Say which of the two you are in before you start.
 
+## Step 0: Which Forge
+
+The disciplines below hold on both GitHub and GitLab. The commands, and several of the
+traps, do not. Read the remote before anything else:
+
+```bash
+git remote get-url origin
+```
+
+- `github.com` (or a GitHub Enterprise host) — the `gh` commands in this file and
+  [mechanics.md](mechanics.md) apply.
+- Otherwise, a host that answers `glab api version` is **GitLab**, hosted or
+  self-managed. (A GitHub Enterprise host fails this probe, which is why the GitHub
+  check comes first.)
+  Read [mechanics-gitlab.md](mechanics-gitlab.md) Step 0 first: on GitLab the
+  instance **version and licence tier** decide whether scoped labels are exclusive,
+  whether issues can block each other, and whether labels can be archived. State the
+  host, version and tier you found before proposing anything.
+
+- Neither (Gitea, Forgejo, Bitbucket, …) — stop and say so. The disciplines still
+  apply, but there are no verified mechanics for that forge; do not improvise commands.
+
+Where this file shows a `gh` command, mechanics-gitlab.md has the GitLab equivalent.
+Vocabulary: a GitHub pull request is a GitLab merge request (`!N`), and GitLab has no
+close reason (below).
+
 ## Step 1: Read the Taxonomy Before You Label Anything
 
 Never label from memory or from a taxonomy someone pasted at you. Read the live one:
@@ -35,7 +61,9 @@ gh api repos/:owner/:repo/milestones --jq '.[]|"\(.number) \(.title) open=\(.ope
 
 **The truncation trap:** `gh label list` and `gh issue list` both default to `--limit 30`, and labels sort by *creation date* — so the bare command hides the newest labels, which are the ones triage needs. Measured on a real 37-label repo, the default listing hid `feature`, `epic`, `decay`, `priority:medium` and `ships-atomically` while leaving `enhancement` visible: you "discover" that `feature` doesn't exist, reach for the legacy twin, and deepen the split you were asked to fix. **Always pass `--limit`.**
 
-**Labels an issue form applies are the canonical vocabulary.** If `feature-request.yml` emits `feature`, then `feature` wins and `enhancement` is legacy — regardless of which has more issues on it.
+**Labels an issue form applies are the canonical vocabulary.** If `feature-request.yml` emits `feature`, then `feature` wins and `enhancement` is legacy — regardless of which has more issues on it. On GitLab the equivalent is a `/label ~feature` quick action inside a `.gitlab/issue_templates/*.md` file — and templates can be inherited from the group or instance, so they may not be in the repository at all. List them through the API (mechanics-gitlab.md), not with `ls`.
+
+**On GitLab, labels may belong to the group, not the project.** A group label is shared by every project under it. Read which kind each label is before you count, rename or retire anything.
 
 Also read `CONTRIBUTING.md` / `CLAUDE.md` for local rules. Milestone semantics in particular are project-specific and often load-bearing.
 
@@ -56,6 +84,8 @@ Every triaged issue carries exactly:
 
 Four axes, and that is the whole output. Two type labels on one issue is the most common triage defect: an issue is not both a bug and a question. Pick the one that decides what happens next.
 
+GitLab scoped labels (`priority::high`) enforce "one per axis" natively, but only on Premium and Ultimate — and they enforce it by **silently removing** the sibling. So on those tiers, adding a scoped priority label *is* a priority change, whatever the command looks like. On Free, scoped names carry no exclusivity and the contract is yours to keep.
+
 If you find yourself adding a fifth kind of thing, you are inventing taxonomy — stop and see Curating below.
 
 ## Milestones: Read What They Mean Here First
@@ -66,6 +96,9 @@ Labels say **what an issue is** (many per issue). A milestone says something abo
 |---|---|---|
 | Release payload | the work committed to a named release | titled like a version (`v4.1`); often "safe to cut" = no open issues in it |
 | Epic / idea | a body of intent being refined into features | titled like a theme; carries an acceptance criterion and a refinement issue |
+| Timebox (GitLab, common) | a sprint or a period | has start and due dates; on Premium, iterations usually do this job instead |
+
+On GitLab, milestones exist at both project and group level, and an issue can sit in a group milestone shared with other projects. A group milestone is somebody else's commitment as well as this project's; changing one is never a local edit.
 
 `CONTRIBUTING.md`, `CLAUDE.md`, and the existing milestone titles tell you which. **Where milestones are epics, never strip one as speculative** — an unshipped milestone there is the roadmap, not a wishlist entry, and the rest of this section does not apply to it.
 
@@ -89,6 +122,8 @@ Close on a **reason**, never on age. Staleness is a signal to look, not a verdic
 | Already fixed | `--reason completed`, citing the PR or symbol that fixed it |
 | Won't fix | `--reason "not planned"` + a sentence of why |
 | Cannot reproduce | Ask first; close only after the ask goes unanswered |
+
+GitLab has **no close reason field**. The reason exists only in the closing comment, so the comment is mandatory. Duplicates use the `/duplicate #N` quick action, which closes and links in one step; everything else is a comment naming the reason, then a close.
 
 **Fixed-but-unreleased is not "fixed" to the reporter.** If the fix is on the main branch but not in a release, say that explicitly — closing with a bare "already fixed" reads as dismissal to someone running the released version.
 
@@ -118,6 +153,8 @@ A new repo is not empty — GitHub seeds exactly nine defaults: `bug`, `document
 
 **Do not scaffold thirty labels into an empty repo.** A label earns its place by answering a question someone actually asks. Start with the type axis only, pick `enhancement` *or* `feature` and never both, and add an area label the first time you genuinely cannot find something without it. Prefix an axis only when it has enough members to need grouping (`area:`, `priority:`); bare names are fine for types and read better in the UI.
 
+A new GitLab project seeds **no** labels, but it may inherit a full set from its group. Before calling a GitLab project empty, list labels including ancestor groups; if the group already has a type axis, use it rather than shadowing it with project labels of the same name.
+
 Conventions differ per repo — match the one you are in rather than importing a scheme from elsewhere.
 
 ## Curating an Existing Taxonomy
@@ -126,11 +163,13 @@ This is the destructive part. Separate it from a triage sweep; do not bundle the
 
 - **Rename, don't delete-and-recreate.** `gh label edit <old> --name <new>` preserves every existing assignment. Delete-then-create loses them all.
 - **Deleting a label strips it from closed issues too**, destroying historical attribution. Count the blast radius across `--state all` before deleting anything.
-- **Retire in place instead of deleting.** A dead label costs nothing but picker noise, and that is fixable without losing history: grey it out and say so in the description — `gh label edit future --color cccccc --description "RETIRED — no milestone is the backlog"`. Deletion buys a shorter picker at the price of history.
+- **Retire in place instead of deleting.** A dead label costs nothing but picker noise, and that is fixable without losing history: grey it out and say so in the description — `gh label edit future --color cccccc --description "RETIRED — no milestone is the backlog"`. Deletion buys a shorter picker at the price of history. GitLab 18.11+ can **archive** a label natively, which is exactly this.
+- **On GitLab, a group label's blast radius is the whole group.** Count across every project that inherits it, and treat renaming one as a change to all of them. Never promote a project label to a group label during curation: it is irreversible and merges same-named labels in sibling projects.
+- **On GitLab, a typo in a label you apply creates a new label.** That is curation by accident. Match every name against the live list first.
 - **The one case where deleting is free** is a repo with no history to lose — a new repo whose unwanted defaults have never been applied. Prove it rather than assume it: the blast-radius count across `--state all` must be zero for issues *and* PRs.
 - **Merge only true synonyms.** `enhancement` → `feature` is a merge. `performance` → `bug` and `refactor` → `decay` are not — they discard a distinction someone made.
 - **Migrate issues before deleting the losing label**, then verify it is unused.
-- **Never rename a bot-owned or form-owned label** without changing the config that emits it (`renovate.json`, `.github/ISSUE_TEMPLATE/*.yml`, workflows). The bot will recreate it, and now you have both.
+- **Never rename a bot-owned or form-owned label** without changing the config that emits it (`renovate.json`, `.github/ISSUE_TEMPLATE/*.yml`, workflows; on GitLab `.triage-policies.yml`, `/label` lines in `.gitlab/issue_templates/`, CI jobs). The bot will recreate it, and now you have both. GitLab issue board lists are bound to labels too: deleting one removes the board column.
 
 ## Rationalization Table
 
@@ -155,10 +194,13 @@ This is the destructive part. Separate it from a triage sweep; do not bundle the
 - A priority or milestone on an issue whose body you did not open
 - `bug` and `question` (or any two types) on the same issue
 - A closing comment that does not name a reason
-- A bare `gh label list` or `gh issue list` in your triage transcript
+- A bare `gh label list` or `gh issue list` in your triage transcript — or a bare `glab label list` / `glab issue list`, which truncate at 30 the same way
+- On GitLab: a label name you did not match against the live list, or a group label edited from a project-level task
 - A milestone added or removed before you established what milestones mean in this repo
 - Anything in your apply-directly block that is not one of the three listed operations
 
 ## Mechanics
 
 Exact commands for all three tool paths — `gh` CLI, `gh api`, and the GitHub MCP server, including which operations each path cannot do and the label-replacement trap in the API/MCP path — are in [mechanics.md](mechanics.md).
+
+The GitLab equivalents — `glab`, `glab api`, and GitLab's MCP server, with instance version and tier detection for self-managed hosts — are in [mechanics-gitlab.md](mechanics-gitlab.md).

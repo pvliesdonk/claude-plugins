@@ -75,6 +75,21 @@ Establish which convention a repository uses before applying either. The
 companion `github-issues:triaging-issues` skill carries the same warning from
 the other side.
 
+## On GitLab
+
+`skills/roadmapping/references/gitlab.md` adapts the model for gitlab.com and
+self-managed GitLab. The rules stay; three mechanisms change:
+
+- On Premium+, a **GitLab epic** can play the roadmap's epic instead of a milestone,
+  which frees milestones for release payloads. Which one is the user's call, recorded
+  in the pointer stanza.
+- **Directed dependencies are Premium+.** On Free only undirected `relates_to` links
+  exist, so the graph cannot be held natively; the reference says so and proposes a
+  recorded convention rather than pretending an undirected link carries order.
+- **Dates pull harder.** GitLab milestones carry start and due dates and burndown
+  charts, epics inherit dates from their children, and the Roadmap view only shows
+  dated epics. None of that relaxes the no-due-date rule.
+
 ## Handing off
 
 When exactly one feature becomes next and is marked ready, this skill is
