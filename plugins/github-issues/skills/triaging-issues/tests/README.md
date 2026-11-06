@@ -16,6 +16,7 @@ is the commands it WOULD run — so a test run cannot mutate a real repo.
 | F6 | Gating and destructive ops mixed into one flat command block | 01, 02, 03 |
 | F7 | Lossy merges (`performance`→`bug`, `refactor`→`decay`) | 03 |
 | F8 | Apply-directly tier stretched to retitles / inferred types | 04 |
+| F9 | GitLab: scoped-label replacement, group-label blast radius, typo-created labels (predicted) | 06 |
 
 ## Scenarios
 
@@ -35,3 +36,7 @@ is the commands it WOULD run — so a test run cannot mutate a real repo.
 - `05-empty-repo.md` — brand-new repo, GitHub defaults only, 3 issues.
   Pass: type axis only, no scaffolded area/priority axes, no milestones,
   `feature` XOR `enhancement`.
+- `06-gitlab-self-managed.md` — self-managed GitLab on Premium, group labels,
+  inherited templates, a scoped priority already set. **Not yet run.**
+  Pass: instance and tier stated first, inherited vocabulary read via the API,
+  scoped priority change confirmed rather than applied, no group label touched.

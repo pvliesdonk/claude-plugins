@@ -1,6 +1,6 @@
 ---
 name: writing-issues
-description: Use when filing a bug, opening or creating a GitHub issue, drafting a ticket, writing up a finding or observation as an issue, when a code review or brainstorm surfaces a problem worth tracking, or when writing the description for a pull request you are about to open.
+description: Use when filing a bug, opening or creating a GitHub or GitLab issue, drafting a ticket, writing up a finding or observation as an issue, when a code review or brainstorm surfaces a problem worth tracking, or when writing the description for a pull request or merge request you are about to open.
 ---
 
 # Writing Issues
@@ -32,6 +32,12 @@ states a rule — `CONTRIBUTING.md`, an issue form, a documented scheme — **th
 and this skill is the fallback**; where it states nothing, everything here applies as
 written. Say which of the two you are in before you start.
 
+**GitHub or GitLab.** Everything in this skill applies to both; only where templates
+live and how links are written differ. `git remote get-url origin` tells you which. On
+GitLab (gitlab.com or a self-managed host) read *pull request* as *merge request*,
+`#N` stays an issue and `!N` is a merge request, and use the GitLab rows in the
+template steps below.
+
 ## Step 1: Check for a Template (Always Do This First)
 
 ```bash
@@ -45,6 +51,24 @@ cat .github/ISSUE_TEMPLATE/config.yml  # chooser
 - Do not invent fields the template does not ask for.
 - State which template you chose and why (e.g., "Using bug_report.yml — only template present, matches bug kind").
 - Use `gh issue create --template <name>` (verify the actual filename first).
+
+**GitLab:** templates are plain Markdown in `.gitlab/issue_templates/*.md` — there
+are no YAML forms, so "fields" are the template's headings. Two places hide templates
+from `ls`:
+
+```bash
+ls .gitlab/issue_templates/ 2>/dev/null
+glab api "projects/:fullpath/templates/issues" | jq -r '.[].name'   # includes group- and instance-level templates
+glab api "projects/:fullpath" | jq -r '.issues_template // empty'  # default set in project settings (Premium+)
+```
+
+A template named `Default.md`, or a default in project settings, is what the web UI
+pre-fills for every new issue; that is the one the project expects unless another
+template matches the kind better. `glab issue create --template <name>` only reads the
+*local* `.gitlab/issue_templates/`, so for an inherited template fetch its content with
+`glab api "projects/:fullpath/templates/issues/<key>"` and pass it as the description.
+Lines starting with `/` in a template (`/label ~bug`) are quick actions; keep them,
+since they are how the project labels a new issue, and do not add any of your own.
 
 **No template:** Use the fallback structure below.
 
@@ -107,6 +131,10 @@ else.
 
 ```bash
 ls .github/PULL_REQUEST_TEMPLATE.md .github/PULL_REQUEST_TEMPLATE/ 2>/dev/null
+# GitLab: merge request templates, including inherited ones and the settings default
+ls .gitlab/merge_request_templates/ 2>/dev/null
+glab api "projects/:fullpath/templates/merge_requests" | jq -r '.[].name'
+glab api "projects/:fullpath" | jq -r '.merge_requests_template // empty'
 ```
 
 If the repo has one, **fill its sections**. It is the project's stated rule, so it wins
@@ -159,6 +187,12 @@ Two things break that chain in practice:
   reference (`Closes #123` in the PR body, or the UI's link), and for an epic use
   native sub-issues rather than a markdown checklist — the link is queryable, a
   checklist is prose.
+- **On GitLab the closing pattern is configurable.** `Closes #123` works on a stock
+  instance, but a self-managed administrator can change the pattern, and it only fires
+  when the merge request lands on the default branch. If the project's
+  `CONTRIBUTING.md` names a pattern, use that one. The native hierarchy is child
+  tasks under an issue (all tiers) and epics (Premium+); a markdown checklist is prose
+  there too.
 
 Then write down the things that are **unrecoverable** if you don't. None of these can
 be reconstructed from the diff by anyone, however careful:

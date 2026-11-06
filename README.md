@@ -34,7 +34,7 @@ Work out what happened and why, from what a project left behind — establishing
 
 ### github-issues
 
-Two disciplines for GitHub issues: writing one that records an observation rather than a work order, and triaging a backlog within the label scheme that exists rather than redesigning it.
+Two disciplines for GitHub and GitLab issues (including self-managed GitLab): writing one that records an observation rather than a work order, and triaging a backlog within the label scheme that exists rather than redesigning it.
 
 - **Source:** [`plugins/github-issues`](plugins/github-issues) — in this repository
 

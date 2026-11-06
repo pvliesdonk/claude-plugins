@@ -1,7 +1,9 @@
 # github-issues
 
-Two disciplines for GitHub issues, one for each half of an issue's life:
-writing one that does not yet exist, and classifying the ones that already do.
+Two disciplines for GitHub and GitLab issues, one for each half of an issue's
+life: writing one that does not yet exist, and classifying the ones that already do.
+The plugin keeps its original name so existing installs and `github-issues:*`
+references keep working; GitLab, hosted or self-managed, is covered by the same skills.
 
 Both exist for the same reason. An agent handed an issue will reach past what
 it observed — asserting a cause it never verified, a priority it inferred from
@@ -89,6 +91,30 @@ matrix, because none of the three can do everything:
   sort by creation date, so the bare command hides the newest labels
 - in the API and MCP paths, `labels` **replaces** the whole set rather than
   appending, and `milestone` takes a number where `gh` takes a title
+
+## GitLab
+
+Both skills start by reading `git remote get-url origin`. The disciplines are the same
+on either forge; the mechanics are not, and on GitLab the instance itself matters:
+`skills/triaging-issues/mechanics-gitlab.md` first reads the instance version,
+edition and licence tier, because those decide which features exist. What differs:
+
+- **Scoped labels** (`priority::high`) are mutually exclusive on Premium and
+  Ultimate, enforced by silently removing the sibling. Adding one is a change, not an
+  add. On Free they are just names.
+- **A label name that does not exist is created** by `glab issue update --label` and
+  the API's `add_labels`. A typo during a sweep is a taxonomy change.
+- **Group labels and group milestones** are shared by every project under the
+  group, so their blast radius is the group.
+- **Templates are Markdown, may be inherited** from the group or instance, and can be
+  set as a default in project settings. None of that is visible to `ls`; the
+  templates API lists them all.
+- **No close reason exists.** The closing comment is the only record of why;
+  duplicates use the `/duplicate` quick action.
+- **Directed `blocks` links are Premium+.** Free has only undirected `relates_to`.
+- **Label deletion** removes the label from every issue and MR, open and closed. The
+  glab documentation for `glab label delete` claims the opposite; the file follows the
+  server's documentation. Labels can be archived natively from 18.11.
 
 ## The other half
 
