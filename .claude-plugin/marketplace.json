@@ -125,9 +125,9 @@
         "source": "git-subdir",
         "url": "https://github.com/pvliesdonk/scholar-mcp.git",
         "path": ".claude-plugin/plugin",
-        "ref": "v3.1.2"
+        "ref": "v3.2.0"
       },
-      "version": "3.1.2"
+      "version": "3.2.0"
     },
     {
       "name": "writing-agent-instructions",
